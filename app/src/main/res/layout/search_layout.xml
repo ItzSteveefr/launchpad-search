@@ -75,29 +75,29 @@
                     style="@style/Theme.Launchpad.SearchBar">
 
                     <EditText
+                        android:id="@+id/search_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingHorizontal="@dimen/search_bar_input_padding"
-                        android:layout_gravity="center"
+                        android:layout_gravity="start"
 
-                        android:drawableLeft="@drawable/baseline_search_24"
                         android:background="@android:color/transparent"
+                        android:drawableLeft="@drawable/baseline_search_24"
+                        android:drawablePadding="8dp"
+                        android:focusable="true"
+
+
+                        android:focusableInTouchMode="true"
                         android:hint="@string/search_bar_input_text"
-
-
-                        android:singleLine="true"
-                        android:textAlignment="center"
-                        android:textColorHint="@color/text_hint"
-                        android:textColor="@color/text_primary"
-
+                        android:imeOptions="actionSearch"
                         android:inputType="text"
 
-                        android:focusable="true"
-                        android:focusableInTouchMode="true"
+                        android:paddingHorizontal="@dimen/search_bar_input_padding"
 
-                        android:id="@+id/search_input"
-                        android:imeOptions="actionSearch"
-                        >
+                        android:singleLine="true"
+                        android:textAlignment="viewStart"
+
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_hint">
 
                     </EditText>
 
@@ -109,7 +109,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/search_suggestions_holder_height"
                     android:id="@+id/search_suggestions_view"
-                    android:padding="8dp">
+                    android:padding="8dp"
+                    android:requiresFadingEdge="horizontal">
 
                 </androidx.recyclerview.widget.RecyclerView>
 
@@ -121,6 +122,7 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/search_result_holder_height"
+                    android:requiresFadingEdge="vertical"
                     android:id="@+id/results_view">
 
                 </androidx.recyclerview.widget.RecyclerView>
