@@ -5,9 +5,12 @@ import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.*
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.ContactsContract
+import android.util.LruCache
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -19,7 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
+import kotlin.math.absoluteValue
 class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
     override var ID = "contacts"
@@ -39,6 +42,19 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
     // Cache for loaded contacts
     private var cachedContacts = mutableMapOf<String, ContactData>()
+
+    //Avatar Cache: Avoid regenerating text avatars
+    private val avatarCache = LruCache<String, Drawable>(100)
+
+    //Material Design Color Palette
+    private val MATERIAL_COLORS = listOf(
+        Color.parseColor("#F44336"), Color.parseColor("#E91E63"), Color.parseColor("#9C27B0"),
+        Color.parseColor("#673AB7"), Color.parseColor("#3F51B5"), Color.parseColor("#2196F3"),
+        Color.parseColor("#03A9F4"), Color.parseColor("#00BCD4"), Color.parseColor("#009688"),
+        Color.parseColor("#4CAF50"), Color.parseColor("#8BC34A"), Color.parseColor("#CDDC39"),
+        Color.parseColor("#FFEB3B"), Color.parseColor("#FFC107"), Color.parseColor("#FF9800"),
+        Color.parseColor("#FF5722"), Color.parseColor("#795548"), Color.parseColor("#607D8B")
+    )
 
     /* Data classes unique to the plugin */
     private data class ContactData(
@@ -173,7 +189,9 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             val queryLower = query.lowercase().trim()
             val allContacts = cachedContacts
 
-            val scoredContacts = allContacts.values.mapNotNull { contact ->
+            val scoredContacts = cachedContacts.values
+                .filter { it.phoneNumbers.isNotEmpty() } //Only contacts with phone numbers
+                .mapNotNull { contact ->
                 val score = calculateFuzzyScore(queryLower, contact)
                 if (score > 0.3) {
                     ScoredContact(contact, score)
@@ -183,10 +201,12 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             val filteredContacts = scoredContacts.map { scoredContact ->
                 val contact = scoredContact.contact
 
-                val contactPhoto: Drawable? = try {
-                    if (contact.photoUri != null) getContactPhotoDrawable(contact.photoUri.toUri()) else null
+                val contactPhoto: Drawable = try {
+                    contact.photoUri?.let {
+                        getContactPhotoDrawable(it.toUri()) ?: createTextAvatar(contact.id, contact.displayName)
+                    } ?: createTextAvatar(contact.id, contact.displayName)
                 } catch (e: Exception) {
-                    null
+                    createTextAvatar(contact.id, contact.displayName)
                 }
 
                 val phoneNumber = contact.phoneNumbers.firstOrNull()?.trim()
@@ -235,6 +255,41 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             e.printStackTrace()
             null
         }
+    }
+
+    //Creates a Material-style initials avatar with caching
+    private fun createTextAvatar(id: String, name: String): Drawable {
+        avatarCache.get(id)?.let { return it }
+
+        val initials = name
+            .split(" ")
+            .filter { it.isNotEmpty() }
+            .take(2)
+            .map { it.first().uppercaseChar() }
+            .joinToString("")
+
+        val size = 128
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        val colorIndex = name.hashCode().absoluteValue % MATERIAL_COLORS.size
+        paint.color = MATERIAL_COLORS[colorIndex]
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+
+        paint.color = Color.WHITE
+        paint.textSize = size / 2.5f
+        paint.textAlign = Paint.Align.CENTER
+        paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+
+        val bounds = Rect()
+        paint.getTextBounds(initials, 0, initials.length, bounds)
+        val textHeight = bounds.height()
+        canvas.drawText(initials, size / 2f, size / 2f + textHeight / 2f, paint)
+
+        val drawable = BitmapDrawable(mContext.resources, bitmap)
+        avatarCache.put(id, drawable)
+        return drawable
     }
 
     private fun calculateFuzzyScore(query: String, contact: ContactData): Double {
