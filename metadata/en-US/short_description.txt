@@ -1,0 +1,1 @@
+a Spotlight search alternative for Android, but better
