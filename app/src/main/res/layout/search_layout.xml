@@ -122,6 +122,7 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/search_result_holder_height"
+                    android:layout_marginTop="-6dp"
                     android:requiresFadingEdge="vertical"
                     android:id="@+id/results_view">
 
