@@ -38,9 +38,21 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.settings_layout)
 
         val window = this.window
-        val surfaceColor = SurfaceColors.SURFACE_5.getColor(baseContext)
 
-        window.statusBarColor = surfaceColor
+        val isDarkTheme = (resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
+
+        val statusBarColor = ContextCompat.getColor(this, R.color.launchpad_background)
+        val navBarColor = ContextCompat.getColor(this, R.color.primary_dark)
+
+        window.statusBarColor = statusBarColor
+        window.navigationBarColor = navBarColor
+        if (isDarkTheme) {
+            window.decorView.systemUiVisibility = 0 // dark icons off
+        } else {
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
 
         // Initialize the new preference-based plugin management
         supportFragmentManager.beginTransaction()

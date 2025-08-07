@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.Launchpad" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:statusBarColor">@color/launchpad_background</item>
+        <item name="android:navigationBarColor">@color/primary_dark</item>
         <item name="preferenceTheme">@style/ThemeOverlay.App.Preference</item>
     </style>
 
