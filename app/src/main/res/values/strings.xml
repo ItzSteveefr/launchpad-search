@@ -6,6 +6,9 @@
     <string name="shortcut_long_label">Launchpad Search</string>
     <string name="shortcut_disabled_label">Launchpad shortcut is disabled</string>
 
+    <string name="shortcut_assistant_label">Assist Settings</string>
+    <string name="shortcut_assistant_long_label">Set as Assistant </string>
+
     <string name="menu_home">Home</string>
     <string name="menu_plugins">Plugins</string>
     <string name="menu_settings">Settings</string>
