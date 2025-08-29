@@ -6,12 +6,14 @@
         app:title="Search">
 
         <CheckBoxPreference
+            android:icon="@drawable/baseline_keyboard_24"
             app:key="setting_search_show_keyboard"
             app:defaultValue="true"
             app:title="@string/settings_search_show_keyboard"
             android:summary="@string/settings_search_show_keyboard_summary"/>
 
         <CheckBoxPreference
+            android:icon="@drawable/baseline_search_off_24"
             app:key="setting_clear_search"
             app:defaultValue="true"
             app:title="@string/settings_clear_search"
@@ -23,18 +25,21 @@
         app:title="@string/settings_general_title">
 
         <CheckBoxPreference
+            android:icon="@drawable/baseline_close_24"
             app:key="setting_close_on_outclick"
             app:defaultValue="false"
             app:title="@string/settings_close_on_outclick"
             app:summary="@string/settings_close_on_outclick_summary" />
 
         <CheckBoxPreference
+            android:icon="@drawable/baseline_fullscreen_exit_24"
             app:key="setting_close_on_action"
             app:defaultValue="true"
             app:title="@string/settings_close_on_action"
             app:summary="@string/settings_close_on_action_summary" />
 
         <CheckBoxPreference
+            android:icon="@drawable/baseline_launch_24"
             app:key="setting_top_result_default"
             app:defaultValue="true"
             app:title="@string/settings_top_result_default"
@@ -45,12 +50,14 @@
         app:title="@string/settings_layout_title">
 
         <SwitchPreference
+            android:icon="@drawable/baseline_blur_on_24"
             app:key="setting_layout_blur_behind"
             app:title="@string/settings_layout_blur"
             app:summary="@string/settings_layout_blur_summary"
             android:defaultValue="false" />
 
         <SwitchPreference
+            android:icon="@drawable/baseline_vertical_align_bottom_24"
             app:key="setting_layout_window_alternate"
             app:title="@string/settings_layout_bottom"
             app:summary="@string/settings_layout_bottom_summary"
@@ -67,19 +74,23 @@
             app:summary="To keep the project ad-free and help me maintain the project" />
 
         <Preference
+            android:icon="@drawable/baseline_about_24"
             app:key="setting_about_app_version"
             app:title="App Version"
             app:summary="Unknown" />
 
         <Preference
+            android:icon="@drawable/baseline_mail_24"
             app:key="setting_about_mail"
             app:title="Email"/>
 
         <Preference
+            android:icon="@drawable/baseline_website_24"
             app:key="setting_about_website"
             app:title="Website"/>
 
         <Preference
+            android:icon="@drawable/baseline_privacy_tip_24"
             app:key="setting_about_privacy"
             app:title="Privacy Policy"/>
     </PreferenceCategory>
