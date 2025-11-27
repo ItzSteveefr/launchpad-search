@@ -8,4 +8,6 @@
     <color name="card_background_light">#1A1A1A</color>
     <color name="search_bar_background">#1A1A1A</color>
     <color name="primary_card_accent">#333333</color>
+    <color name="launchpad_background">#0D0D0D</color>
+    <color name="primary_dark">#000000</color>
 </resources>
