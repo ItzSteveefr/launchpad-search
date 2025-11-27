@@ -21,8 +21,6 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.R
 import com.devrinth.launchpad.activities.SettingsActivity
-import com.devrinth.launchpad.adapters.PinnedActionAdapter
-import com.devrinth.launchpad.adapters.PinnedActionListAdapter
 import com.devrinth.launchpad.receivers.AssistantActionReceiver
 
 class SearchWindow(val context: Context) {
