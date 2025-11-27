@@ -14,7 +14,6 @@ import android.view.WindowManager
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.cardview.widget.CardView
 import androidx.core.view.animation.PathInterpolatorCompat
@@ -27,9 +26,6 @@ import com.devrinth.launchpad.adapters.PinnedActionListAdapter
 import com.devrinth.launchpad.receivers.AssistantActionReceiver
 
 class SearchWindow(val context: Context) {
-
-    private lateinit var closeBtn : ImageButton
-    private lateinit var settingsBtn : ImageButton
 
     private lateinit var searchInput : EditText
     private lateinit var resultsView : RecyclerView
@@ -81,25 +77,10 @@ class SearchWindow(val context: Context) {
         resultsView = contentView.findViewById(R.id.results_view)
 //            pinnedResultView = contentView.findViewById(R.id.pinned_apps_view)
 //            pinnedResultView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
-        closeBtn = contentView.findViewById(R.id.action_close)
-        settingsBtn = contentView.findViewById(R.id.action_settings)
-
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun initListeners() {
-        closeBtn.setOnClickListener {
-            hideWindow()
-        }
-
-        settingsBtn.setOnClickListener {
-            hideWindow()
-            context.startActivity(
-                Intent(context, SettingsActivity::class.java).addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("from_launchpad", true))
-        }
-
         if (Build.VERSION.SDK_INT >= 33) {
             context.registerReceiver(reloadReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_SHOW),
                 VoiceInteractionSessionService.RECEIVER_EXPORTED

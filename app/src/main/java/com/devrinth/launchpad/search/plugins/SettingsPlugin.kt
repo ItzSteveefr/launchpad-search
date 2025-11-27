@@ -1,9 +1,11 @@
 package com.devrinth.launchpad.search.plugins
 
 import android.content.Context
+import android.content.Intent
 import android.provider.Settings
 import androidx.appcompat.content.res.AppCompatResources
 import com.devrinth.launchpad.R
+import com.devrinth.launchpad.activities.SettingsActivity
 import com.devrinth.launchpad.adapters.ResultAdapter
 import com.devrinth.launchpad.search.SearchPlugin
 import com.devrinth.launchpad.utils.IntentUtils
@@ -49,6 +51,18 @@ class SettingsPlugin(mContext: Context) : SearchPlugin(mContext) {
                         action2 = null
                     )
                 )
+        }
+
+        if (StringUtils.simpleContains(query, "spotlight search")) {
+            filteredSettings.add(
+                ResultAdapter(
+                    "Spotlight Search",
+                    null,
+                    AppCompatResources.getDrawable(mContext, R.drawable.baseline_settings_24),
+                    Intent(mContext, SettingsActivity::class.java),
+                    null
+                )
+            )
         }
         pluginResult(filteredSettings, query)
 
