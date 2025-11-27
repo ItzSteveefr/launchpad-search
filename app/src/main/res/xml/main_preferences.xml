@@ -64,7 +64,7 @@
             android:defaultValue="false" />
 
         <ListPreference
-            android:icon="@drawable/baseline_color_lens_24"
+            android:icon="@drawable/baseline_settings_24"
             app:key="setting_theme"
             app:title="@string/settings_theme_title"
             app:summary="@string/settings_theme_summary"

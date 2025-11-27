@@ -14,7 +14,7 @@
     <color name="text_secondary">@android:color/secondary_text_light</color>
 
     <color name="primary_background">#F3F3F3</color>
-    <color name="primary_dark">#FFFFFF</color>
+    <color name="card_background_light">#FFFFFF</color>
     <color name="search_bar_background">#34000000</color>
     <color name="primary_card_accent">#E1E1E1</color>
 

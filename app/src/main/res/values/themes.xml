@@ -7,7 +7,7 @@
 
     <style name="Theme.Launchpad" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:statusBarColor">@color/primary_background</item>
-        <item name="android:navigationBarColor">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/card_background_light</item>
         <item name="preferenceTheme">@style/ThemeOverlay.App.Preference</item>
     </style>
 
