@@ -3,6 +3,7 @@ package com.devrinth.launchpad.search
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -33,7 +34,7 @@ class SearchManager(
     searchTextBox: EditText,
     private var resultRecyclerView: RecyclerView,
     private var searchSuggestionsView: RecyclerView,
-    searchCardLayout: LinearLayout
+    private var searchCardLayout: LinearLayout
 ) {
 
     private var searchQuery: String = ""
@@ -252,6 +253,7 @@ class SearchManager(
         val isTypingForward = searchQuery.length > previousQuery.length &&
                              searchQuery.startsWith(previousQuery, ignoreCase = true)
 
+        TransitionManager.beginDelayedTransition(searchCardLayout)
         if (searchQuery.isEmpty()) {
             resultRecyclerView.visibility = View.GONE
             clearAllResults()
