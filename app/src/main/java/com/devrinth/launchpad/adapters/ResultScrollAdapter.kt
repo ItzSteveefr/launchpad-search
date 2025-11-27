@@ -10,7 +10,6 @@ import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -76,8 +75,6 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
         if (mResultAdapter.action1 != null) {
             holder.parentView.setOnClickListener {
                 it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-                val animation = AnimationUtils.loadAnimation(mContext, R.anim.scale_effect)
-                it.startAnimation(animation)
                 if (closeOnClick) {
                     mContext.sendBroadcast(Intent(AssistantActionReceiver.ACTION_OVERLAY_HIDE))
                 }
@@ -100,8 +97,6 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
             holder.parentView.setOnLongClickListener { false }
         }
 
-        val animation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in)
-        holder.itemView.startAnimation(animation)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
