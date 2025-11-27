@@ -27,12 +27,6 @@ class PluginManager(context: Context) {
             iconResource = R.drawable.baseline_calculate_24
         ),
         PluginAdapter(
-            id = "websearch",
-            title = "Web Search",
-            description = "Search the web using your preferred search engine",
-            iconResource = R.drawable.web_search_24
-        ),
-        PluginAdapter(
             id = "units",
             title = "Unit Conversion",
             description = "Convert between different units of measurement",
@@ -78,7 +72,7 @@ class PluginManager(context: Context) {
     fun hasSettings(pluginId: String): Boolean {
         // Check if plugin has dedicated settings screen
         return when (pluginId) {
-            "websearch", "calculator", "units", "apps", "contacts", "settings", "search_suggestions" -> true
+            "calculator", "units", "apps", "contacts", "settings", "search_suggestions" -> true
             else -> false
         }
     }
