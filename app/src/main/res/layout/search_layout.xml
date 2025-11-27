@@ -39,34 +39,6 @@
                 android:padding="@dimen/large_spacing"
                 >
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-
-                    android:orientation="horizontal">
-
-                    <ImageButton
-                        android:layout_width="@dimen/search_action_button_geometry"
-                        android:layout_height="@dimen/search_action_button_geometry"
-                        android:layout_margin="@dimen/default_spacing"
-                        android:id="@+id/action_settings"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/baseline_settings_24"
-                        android:contentDescription="@string/search_action_settings"
-                        />
-
-                    <ImageButton
-                        android:layout_width="@dimen/search_action_button_geometry"
-                        android:layout_height="@dimen/search_action_button_geometry"
-                        android:layout_margin="@dimen/default_spacing"
-                        android:id="@+id/action_close"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/baseline_close_24"
-                        android:contentDescription="@string/search_action_close"
-
-                        />
-                </LinearLayout>
 
 
                 <androidx.cardview.widget.CardView
