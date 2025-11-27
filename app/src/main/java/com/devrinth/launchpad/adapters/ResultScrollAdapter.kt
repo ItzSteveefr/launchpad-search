@@ -18,7 +18,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.R
 import com.devrinth.launchpad.receivers.AssistantActionReceiver
 
-class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var mContext: Context) : RecyclerView.Adapter<ResultScrollAdapter.ViewHolder>() {
+import com.devrinth.launchpad.search.SearchManager
+
+class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var mContext: Context, private val searchManager: SearchManager) : RecyclerView.Adapter<ResultScrollAdapter.ViewHolder>() {
 
     private val sharedPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(mContext)
@@ -74,6 +76,10 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
 
         if (mResultAdapter.action1 != null) {
             holder.parentView.setOnClickListener {
+                val extra = mResultAdapter.extra
+                if (extra != null) {
+                    searchManager.recordAppLaunch(extra)
+                }
                 val animation = AnimationUtils.loadAnimation(mContext, R.anim.scale_effect)
                 it.startAnimation(animation)
                 if (closeOnClick) {
