@@ -1,6 +1,7 @@
 package com.devrinth.launchpad.search.plugins
 
 import android.content.Context
+import android.content.Intent
 import android.provider.Settings
 import androidx.appcompat.content.res.AppCompatResources
 import com.devrinth.launchpad.R
