@@ -62,7 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 
-                    android:textColor="@color/white"
+                    android:textColor="@color/text_primary"
                     android:textSize="@dimen/home_banner_text"
                     android:fontFamily="sans-serif"
                     android:letterSpacing="0.2"

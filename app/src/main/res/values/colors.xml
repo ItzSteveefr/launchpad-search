@@ -1,24 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="transparent_grey">#2CFFFFFF</color>
+<resources>
+    <color name="text_hint">#808080</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
 
-    <color name="launchpad_accent">#FFC266</color>
-    <color name="launchpad_background">#252525</color>
-
-    <color name="icon_color">@android:color/secondary_text_light</color>
-
-    <color name="text_hint">@android:color/tertiary_text_light</color>
-    <color name="text_primary">@android:color/primary_text_light</color>
-    <color name="text_secondary">@android:color/secondary_text_light</color>
-
-    <color name="primary_background">#F3F3F3</color>
+    <color name="primary_background">#F5F5F5</color>
     <color name="card_background_light">#FFFFFF</color>
-    <color name="search_bar_background">#34000000</color>
-    <color name="primary_card_accent">#E1E1E1</color>
-    <color name="primary_dark">#2C2C2C</color>
-
-    <color name="clickable_foreground">?android:attr/selectableItemBackgroundBorderless</color>
-
+    <color name="search_bar_background">#FFFFFF</color>
+    <color name="primary_card_accent">#E0E0E0</color>
+    <color name="launchpad_background">#F5F5F5</color>
+    <color name="primary_dark">#212121</color>
 </resources>

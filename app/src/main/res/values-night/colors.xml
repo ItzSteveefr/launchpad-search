@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="icon_color">@android:color/secondary_text_dark</color>
+<resources>
+    <color name="text_hint">#808080</color>
+    <color name="text_primary">#E6E6E6</color>
+    <color name="text_secondary">#B3B3B3</color>
 
-    <color name="text_hint">@android:color/tertiary_text_dark</color>
-    <color name="text_primary">@android:color/primary_text_dark</color>
-    <color name="text_secondary">@android:color/secondary_text_dark</color>
-
-    <color name="primary_background">@android:color/background_dark</color>
-    <color name="primary_dark">#2C2C2C</color>
-    <color name="primary_card_accent">#434343</color>
+    <color name="primary_background">#0D0D0D</color>
+    <color name="card_background_light">#1A1A1A</color>
+    <color name="search_bar_background">#1A1A1A</color>
+    <color name="primary_card_accent">#333333</color>
+    <color name="launchpad_background">#0D0D0D</color>
+    <color name="primary_dark">#000000</color>
 </resources>
