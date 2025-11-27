@@ -63,14 +63,6 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
         val mResultAdapter : ResultAdapter = mResults[position]
 
         holder.resultValue.text = mResultAdapter.value
-        holder.resultExtra.text = mResultAdapter.extra
-
-        if (mResultAdapter.extra != null) {
-            holder.resultExtra.text = mResultAdapter.extra
-            holder.resultExtra.visibility = View.VISIBLE
-        } else {
-            holder.resultExtra.visibility = View.GONE
-        }
 
         holder.resultIcon.setImageDrawable(mResultAdapter.image)
 
@@ -110,7 +102,6 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val resultValue: TextView = itemView.findViewById(R.id.result_text)
-        val resultExtra: TextView = itemView.findViewById(R.id.result_extra)
         val resultIcon: ImageView = itemView.findViewById(R.id.result_icon)
 
         val parentView: View = itemView
