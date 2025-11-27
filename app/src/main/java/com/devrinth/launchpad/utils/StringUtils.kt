@@ -101,7 +101,6 @@ class StringUtils {
          * fuzzyContains("dlrow", "hello world") // Returns false (wrong order)
          * ```
          */
-        @Deprecated("Use fuzzySearch for scored matching", ReplaceWith("fuzzySearch(query, target) > 0"))
         fun fuzzyContains(query: String, target: String): Boolean {
             if (query.isEmpty()) return true
             if (target.isEmpty()) return false
@@ -118,63 +117,6 @@ class StringUtils {
             }
 
             return queryIndex == queryLower.length
-        }
-
-        fun fuzzySearch(query: String, target: String): Int {
-            if (query.isEmpty()) {
-                return if (target.isEmpty()) 100 else 0
-            }
-
-            val queryLower = query.lowercase().trim()
-            val targetLower = target.lowercase().trim()
-            var score = 0
-            var queryIndex = 0
-            var targetIndex = 0
-            var consecutiveMatches = 0
-            var isFirstMatch = true
-
-            while (queryIndex < queryLower.length && targetIndex < targetLower.length) {
-                if (queryLower[queryIndex] == targetLower[targetIndex]) {
-                    var matchScore = 1
-                    if (isFirstMatch) {
-                        matchScore += 2
-                        isFirstMatch = false
-                    }
-                    if (targetIndex == 0 || targetLower[targetIndex - 1] == ' ') {
-                        matchScore += 5
-                    }
-                    if (consecutiveMatches > 0) {
-                        matchScore += consecutiveMatches * 2
-                    }
-                    score += matchScore
-                    consecutiveMatches++
-                    queryIndex++
-                } else {
-                    consecutiveMatches = 0
-                }
-                targetIndex++
-            }
-            if (queryIndex != queryLower.length) {
-                return 0
-            }
-
-            val targetWords = target.split(" ")
-            if (targetWords.size > 1 && query.length > 1) {
-                val acronym = targetWords.mapNotNull { it.firstOrNull() }.joinToString("")
-                if (acronym.equals(query, ignoreCase = true)) {
-                    score += 30
-                }
-            } else if (query.length > 1 && query.all { it.isUpperCase() }) {
-                val acronym = target.split(" ").mapNotNull { it.firstOrNull() }.joinToString("")
-                if (acronym.startsWith(query, ignoreCase = true)) {
-                    score += 20
-                }
-            }
-
-
-            score -= (target.length - query.length)
-
-            return score
         }
 
         /**
