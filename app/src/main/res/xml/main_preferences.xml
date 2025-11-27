@@ -62,6 +62,15 @@
             app:title="@string/settings_layout_bottom"
             app:summary="@string/settings_layout_bottom_summary"
             android:defaultValue="false" />
+
+        <ListPreference
+            android:icon="@drawable/baseline_settings_24"
+            app:key="setting_theme"
+            app:title="@string/settings_theme_title"
+            app:summary="@string/settings_theme_summary"
+            app:entries="@array/theme_entries"
+            app:entryValues="@array/theme_values"
+            app:defaultValue="system" />
     </PreferenceCategory>
 
     <PreferenceCategory

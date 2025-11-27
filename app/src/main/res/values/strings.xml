@@ -62,6 +62,9 @@
     <string name="settings_layout_bottom">Bottom layout</string>
     <string name="settings_layout_bottom_summary">EXPERIMENTAL\n\nInstead of a floating window placed at the top, it opens a bottom sheet like menu similar to other assistants.</string>
 
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_summary">Choose between light and dark theme</string>
+
     <string name="settings_plugins_title">Plugins</string>
     <string name="settings_plugins_enabled">Enabled Plugins</string>
     <string name="settings_plugins_enabled_summary">Initialize and use plugins that you want</string>
