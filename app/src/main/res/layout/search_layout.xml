@@ -105,6 +105,31 @@
 
         </androidx.cardview.widget.CardView>
 
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_below="@id/search_card_view"-->
+<!--            style="@style/Theme.Launchpad.Bottom"-->
+<!--            >-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_margin="@dimen/large_spacing"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:gravity="center">-->
+
+<!--                <androidx.recyclerview.widget.RecyclerView-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="@dimen/pinned_holder_height"-->
+<!--                    android:id="@+id/pinned_apps_view">-->
+
+<!--                </androidx.recyclerview.widget.RecyclerView>-->
+
+<!--            </LinearLayout>-->
+
+<!--        </androidx.cardview.widget.CardView>-->
+
     </LinearLayout>
     <Space
         android:layout_width="0dp"

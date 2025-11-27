@@ -59,6 +59,16 @@
 
                 android:id="@+id/result_text"
                 />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Result extra"
+                android:textSize="@dimen/result_extra_font"
+                android:textColor="@color/text_secondary"
+
+                android:id="@+id/result_extra"
+                />
         </LinearLayout>
     </LinearLayout>
 
