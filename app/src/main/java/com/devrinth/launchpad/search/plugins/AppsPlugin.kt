@@ -86,7 +86,7 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
             scoredApps.sortedByDescending { it.second }.map { (appInfo, _) ->
                 ResultAdapter(
                     appInfo.label,
-                    appInfo.packageName,
+                    null,
                     appInfo.icon,
                     IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
                     null
