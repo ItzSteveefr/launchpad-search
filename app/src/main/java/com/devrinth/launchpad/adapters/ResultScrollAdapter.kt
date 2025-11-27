@@ -6,6 +6,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.service.voice.VoiceInteractionSessionService
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -75,6 +76,7 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
         if (mResultAdapter.action1 != null) {
             holder.parentView.setOnClickListener {
                 val animation = AnimationUtils.loadAnimation(mContext, R.anim.scale_effect)
+                it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 it.startAnimation(animation)
                 if (closeOnClick) {
                     mContext.sendBroadcast(Intent(AssistantActionReceiver.ACTION_OVERLAY_HIDE))

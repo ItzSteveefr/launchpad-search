@@ -103,7 +103,7 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
             }.map { appInfo ->
                 ResultAdapter(
                     appInfo.label,
-                    appInfo.packageName,
+                    null,
                     appInfo.icon,
                     IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
                     null
