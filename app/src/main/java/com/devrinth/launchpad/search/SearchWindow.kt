@@ -21,18 +21,12 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.R
 import com.devrinth.launchpad.activities.SettingsActivity
-import com.devrinth.launchpad.adapters.PinnedActionAdapter
-import com.devrinth.launchpad.adapters.PinnedActionListAdapter
 import com.devrinth.launchpad.receivers.AssistantActionReceiver
 
 class SearchWindow(val context: Context) {
 
     private lateinit var searchInput : EditText
     private lateinit var resultsView : RecyclerView
-
-    private lateinit var pinnedResultView : RecyclerView
-    private lateinit var pinnedAdapter : PinnedActionListAdapter
-    private var pinnedArray = ArrayList<PinnedActionAdapter>()
 
     private lateinit var searchSuggestionsView: RecyclerView
     private lateinit var launchpadMainLayout: LinearLayout
@@ -75,8 +69,6 @@ class SearchWindow(val context: Context) {
         searchSuggestionsView = contentView.findViewById(R.id.search_suggestions_view)
 
         resultsView = contentView.findViewById(R.id.results_view)
-//            pinnedResultView = contentView.findViewById(R.id.pinned_apps_view)
-//            pinnedResultView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -94,25 +86,6 @@ class SearchWindow(val context: Context) {
                 this.hideWindow()
             }
         }
-
-//            pinnedAdapter = PinnedActionListAdapter(pinnedArray, context)
-//            pinnedResultView.adapter = pinnedAdapter
-//
-//            pinnedArray.add(
-//                PinnedActionAdapter(
-//                    "android.intent.action.VIEW",
-//                    "https://google.com",
-//                    AppCompatResources.getDrawable(context, R.drawable.web_search_24)
-//                `)
-//            )
-//            pinnedArray.add(
-//                PinnedActionAdapter(
-//                    "android.intent.action.VIEW",
-//                    "https://google.com",
-//                    AppCompatResources.getDrawable(context, R.drawable.baseline_settings_24)
-//                )
-//            )`
-//            pinnedAdapter.notifyDataSetChanged()
     }
 
     // PUBLIC
@@ -172,15 +145,11 @@ class SearchWindow(val context: Context) {
 
     fun showKeyboard() {
         if (sharedPreferences.getBoolean("setting_search_show_keyboard", true)) {
-            //searchInput.requestFocus()
-            searchInput.isFocusableInTouchMode = true // kb
-            searchInput.postDelayed({
-                searchInput.requestFocus()
-
-                val lManager =
-                    context.getSystemService(VoiceInteractionSessionService.INPUT_METHOD_SERVICE) as InputMethodManager
-                lManager.showSoftInput(searchInput, 0)
-            }, 160)
+            searchInput.isFocusableInTouchMode = true
+            searchInput.requestFocus()
+            val lManager =
+                context.getSystemService(VoiceInteractionSessionService.INPUT_METHOD_SERVICE) as InputMethodManager
+            lManager.showSoftInput(searchInput, 0)
         }
     }
 

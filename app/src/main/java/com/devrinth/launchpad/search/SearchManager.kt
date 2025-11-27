@@ -103,7 +103,7 @@ class SearchManager(
         searchSuggestionListAdapter = SearchSuggestionListAdapter(searchSuggestions, mContext)
         searchSuggestionsView.adapter = searchSuggestionListAdapter
 
-        resultScrollAdapter = ResultScrollAdapter(resultArray, mContext)
+        resultScrollAdapter = ResultScrollAdapter(resultArray, mContext, this)
         resultRecyclerView.adapter = resultScrollAdapter
 
         if (!sharedPreferences.getBoolean("setting_clear_search", true)) {
@@ -246,6 +246,13 @@ class SearchManager(
 
     private fun isDuplicateSuggestion(existing: ResultAdapter, new: ResultAdapter): Boolean {
         return existing.value == new.value
+    }
+
+    fun recordAppLaunch(packageName: String) {
+        val launchCount = sharedPreferences.getInt("launch_count_$packageName", 0)
+        sharedPreferences.edit {
+            putInt("launch_count_$packageName", launchCount + 1)
+        }
     }
 
     private fun processQuery() {
