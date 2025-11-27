@@ -47,7 +47,6 @@ class SearchManager(
         "apps" to AppsPlugin(mContext),
         "contacts" to ContactsPlugin(mContext),
         "calculator" to CalculatorPlugin(mContext),
-        "websearch" to WebSearchPlugin(mContext),
         "units" to UnitConversionPlugin(mContext),
         "settings" to SettingsPlugin(mContext),
         "shortcuts" to ShortcutsPlugin(mContext),
