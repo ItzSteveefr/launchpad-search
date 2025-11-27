@@ -7,7 +7,7 @@
     <dimen name="ginormous_spacing">0dp</dimen>
 
     <dimen name="parent_layout_max">450dp</dimen>
-    <dimen name="parent_layout_padding_top">32dp</dimen>
+    <dimen name="parent_layout_padding_top">16dp</dimen>
     <item name="parent_layout_space_ratio" format="float" type="integer">0.005</item>
 
     <dimen name="search_layout_radius">22dp</dimen>
