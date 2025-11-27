@@ -249,18 +249,18 @@ class SearchManager(
     }
 
     private fun processQuery() {
-        val isTypingForward = searchQuery.length > previousQuery.length &&
-                             searchQuery.startsWith(previousQuery, ignoreCase = true)
-
         if (searchQuery.isEmpty()) {
             resultRecyclerView.visibility = View.GONE
             clearAllResults()
             clearAllSuggestions()
-            previousQuery = searchQuery
+            previousQuery = ""
             return
-        } else {
-            resultRecyclerView.visibility = View.VISIBLE
         }
+
+        resultRecyclerView.visibility = View.VISIBLE
+
+        val isTypingForward = searchQuery.length > previousQuery.length &&
+                             searchQuery.startsWith(previousQuery, ignoreCase = true)
 
         if (isTypingForward) {
             filterExistingResultsForward()

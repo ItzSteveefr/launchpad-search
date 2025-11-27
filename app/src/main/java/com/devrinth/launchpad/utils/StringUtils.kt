@@ -105,18 +105,20 @@ class StringUtils {
             if (query.isEmpty()) return true
             if (target.isEmpty()) return false
 
-            val queryLower = query.lowercase().trim()
-            val targetLower = target.lowercase().trim()
+            val normalizedQuery = query.replace(Regex("[\\s\\p{Punct}]"), "").lowercase()
+            val normalizedTarget = target.replace(Regex("[\\s\\p{Punct}]"), "").lowercase()
 
             var queryIndex = 0
+            var targetIndex = 0
 
-            for (char in targetLower) {
-                if (queryIndex < queryLower.length && char == queryLower[queryIndex]) {
+            while (queryIndex < normalizedQuery.length && targetIndex < normalizedTarget.length) {
+                if (normalizedQuery[queryIndex] == normalizedTarget[targetIndex]) {
                     queryIndex++
                 }
+                targetIndex++
             }
 
-            return queryIndex == queryLower.length
+            return queryIndex == normalizedQuery.length
         }
 
         /**

@@ -6,6 +6,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.service.voice.VoiceInteractionSessionService
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,26 +74,27 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
 
         if (mResultAdapter.action1 != null) {
             holder.parentView.setOnClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 if (closeOnClick) {
                     mContext.sendBroadcast(Intent(AssistantActionReceiver.ACTION_OVERLAY_HIDE))
                 }
-                mContext.startActivity( mResultAdapter.action1 )
+                mResultAdapter.action1?.invoke()
             }
-
         } else {
-            holder.parentView.setOnClickListener {  }
+            holder.parentView.setOnClickListener { }
         }
 
         if (mResultAdapter.action2 != null) {
             holder.parentView.setOnLongClickListener {
+                it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 if (closeOnClick) {
                     mContext.sendBroadcast(Intent(AssistantActionReceiver.ACTION_OVERLAY_HIDE))
                 }
-                mContext.startActivity(mResultAdapter.action2)
+                mResultAdapter.action2?.invoke()
                 true
             }
         } else {
-            holder.parentView.setOnLongClickListener { false  }
+            holder.parentView.setOnLongClickListener { false }
         }
 
     }

@@ -234,8 +234,12 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
                     contact.displayName,
                     contactInfo,
                     contactPhoto,
-                    primaryIntent,
-                    secondaryIntent
+                    action1 = if (primaryIntent != null) {
+                        { mContext.startActivity(primaryIntent) }
+                    } else null,
+                    action2 = if (secondaryIntent != null) {
+                        { mContext.startActivity(secondaryIntent) }
+                    } else null
                 )
             }
 

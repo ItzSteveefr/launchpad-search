@@ -20,8 +20,8 @@ class CalculatorPlugin(mContext: Context) : SearchPlugin(mContext) {
                     Keval.eval(query).toString(),
                     query,
                     AppCompatResources.getDrawable(mContext, R.drawable.baseline_calculate_24),
-                    null,
-                    null
+                    action1 = null,
+                    action2 = null
                 ))
             , query)
         } catch (e: Exception) {

@@ -65,8 +65,15 @@ class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
                                 label,
                                 mContext.getString(R.string.plugin_shortcuts_query).format(appLabel),
                                 ri.activityInfo.loadIcon(mPackageManager),
-                                IntentUtils.getShortcutIntent(ri.activityInfo.packageName, ri.activityInfo.name),
-                                null
+                                action1 = {
+                                    mContext.startActivity(
+                                        IntentUtils.getShortcutIntent(
+                                            ri.activityInfo.packageName,
+                                            ri.activityInfo.name
+                                        )
+                                    )
+                                },
+                                action2 = null
                             )
                         )
                     }

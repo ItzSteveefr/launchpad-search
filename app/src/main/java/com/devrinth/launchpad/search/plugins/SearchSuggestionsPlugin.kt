@@ -72,8 +72,16 @@ class SearchSuggestionsPlugin(mContext: Context) : SearchPlugin(mContext) {
                             suggestion,
                             null,
                             null,
-                            IntentUtils.getLinkIntent( searchEngineQ.format( StringUtils.encodeUrl(query) ) ),
-                            null
+                            action1 = {
+                                mContext.startActivity(
+                                    IntentUtils.getLinkIntent(
+                                        searchEngineQ.format(
+                                            StringUtils.encodeUrl(query)
+                                        )
+                                    )
+                                )
+                            },
+                            action2 = null
                         )
                     )
 

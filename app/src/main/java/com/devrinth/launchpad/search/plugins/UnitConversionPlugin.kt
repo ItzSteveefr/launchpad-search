@@ -119,8 +119,8 @@ class UnitConversionPlugin(mContext: Context) : SearchPlugin(mContext) {
                         convertLength(input),
                         returnUnits(input),
                         AppCompatResources.getDrawable(mContext, R.drawable.baseline_ruler_24),
-                        null,
-                        null
+                        action1 = null,
+                        action2 = null
 
                     )
 
@@ -129,8 +129,8 @@ class UnitConversionPlugin(mContext: Context) : SearchPlugin(mContext) {
                         convertMass(input),
                         returnUnits(input),
                         AppCompatResources.getDrawable(mContext, R.drawable.baseline_scale_24),
-                        null,
-                        null
+                        action1 = null,
+                        action2 = null
                     )
 
                 input.contains(Regex("c|celsius|f|fahrenheit|k|kelvin")) ->
@@ -138,8 +138,8 @@ class UnitConversionPlugin(mContext: Context) : SearchPlugin(mContext) {
                         convertTemperature(input),
                         returnUnits(input),
                         AppCompatResources.getDrawable(mContext, R.drawable.baseline_thermostat_24),
-                        null,
-                        null
+                        action1 = null,
+                        action2 = null
                     )
 
                 else -> throw IllegalArgumentException("Unknown conversion type")

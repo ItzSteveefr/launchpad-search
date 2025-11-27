@@ -58,7 +58,7 @@ class SearchSuggestionListAdapter(private val mSuggestions: List<ResultAdapter>,
             if (closeOnClick) {
                 mContext.sendBroadcast(Intent(AssistantActionReceiver.ACTION_OVERLAY_HIDE))
             }
-            mContext.startActivity( mResultAdapter.action1 )
+            mResultAdapter.action1?.invoke()
         }
     }
 

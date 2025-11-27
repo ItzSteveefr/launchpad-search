@@ -66,7 +66,7 @@
                 android:text="Result extra"
                 android:textSize="@dimen/result_extra_font"
                 android:textColor="@color/text_secondary"
-
+                android:visibility="gone"
                 android:id="@+id/result_extra"
                 />
         </LinearLayout>

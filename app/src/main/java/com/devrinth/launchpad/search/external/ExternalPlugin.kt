@@ -92,8 +92,10 @@ class ExternalSearch(var mContext: Context) {
                                 if (response.imageUrl == null) { mContext.packageManager.getApplicationIcon(pkg) } else { IconUtils.base64ToDrawable(mContext,
                                     response.imageUrl.toString()
                                 ) },
-                                if (response.action1 != "")  { IntentUtils.getLinkIntent(response.action1) } else { null },
-                                null
+                                action1 = if (response.action1 != "") {
+                                    { mContext.startActivity(IntentUtils.getLinkIntent(response.action1)) }
+                                } else null,
+                                action2 = null
                             ), response.query, pkg)
                         }
                     }

@@ -43,8 +43,11 @@ class SettingsPlugin(mContext: Context) : SearchPlugin(mContext) {
                         key,
                         null,
                         AppCompatResources.getDrawable(mContext, R.drawable.baseline_settings_24),
-                        IntentUtils.getExternalIntent(value),
-                        null )
+                        action1 = {
+                            mContext.startActivity(IntentUtils.getExternalIntent(value))
+                        },
+                        action2 = null
+                    )
                 )
         }
         pluginResult(filteredSettings, query)
