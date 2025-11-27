@@ -76,8 +76,9 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
 
         if (mResultAdapter.action1 != null) {
             holder.parentView.setOnClickListener {
-                if (mResultAdapter.extra != null) {
-                    searchManager.recordAppLaunch(mResultAdapter.extra)
+                val extra = mResultAdapter.extra
+                if (extra != null) {
+                    searchManager.recordAppLaunch(extra)
                 }
                 val animation = AnimationUtils.loadAnimation(mContext, R.anim.scale_effect)
                 it.startAnimation(animation)
