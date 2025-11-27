@@ -10,12 +10,12 @@
     <dimen name="parent_layout_padding_top">16dp</dimen>
     <item name="parent_layout_space_ratio" format="float" type="integer">0.005</item>
 
-    <dimen name="search_layout_radius">24dp</dimen>
+    <dimen name="search_layout_radius">28dp</dimen>
     <dimen name="search_action_button_geometry">50dp</dimen>
 
     <dimen name="search_bar_height">50dp</dimen>
     <dimen name="search_bar_input_padding">20dp</dimen>
-    <dimen name="search_bar_radius">24dp</dimen>
+    <dimen name="search_bar_radius">28dp</dimen>
 
     <dimen name="search_suggestions_holder_height">60dp</dimen>
 
@@ -28,7 +28,7 @@
     <dimen name="result_item_height">50dp</dimen>
     <dimen name="result_item_margin">10dp</dimen>
     <dimen name="result_item_alternate_margin_top">5dp</dimen>
-    <dimen name="result_item_radius">24dp</dimen>
+    <dimen name="result_item_radius">28dp</dimen>
 
     <dimen name="result_main_font">16sp</dimen>
     <dimen name="result_extra_font">12sp</dimen>
