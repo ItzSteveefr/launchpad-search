@@ -13,8 +13,9 @@
     <color name="text_primary">@android:color/primary_text_light</color>
     <color name="text_secondary">@android:color/secondary_text_light</color>
 
-    <color name="primary_background">@android:color/background_light</color>
-    <color name="primary_dark">#34000000</color>
+    <color name="primary_background">#F3F3F3</color>
+    <color name="primary_dark">#FFFFFF</color>
+    <color name="search_bar_background">#34000000</color>
     <color name="primary_card_accent">#E1E1E1</color>
 
     <color name="clickable_foreground">?android:attr/selectableItemBackgroundBorderless</color>
