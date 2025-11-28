@@ -51,7 +51,7 @@ class LaunchpadOverlayActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        mSearchWindow.reload()
+        mSearchWindow.resume()
     }
     override fun onPause() {
         super.onPause()

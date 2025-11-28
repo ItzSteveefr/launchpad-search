@@ -3,23 +3,25 @@ package com.devrinth.launchpad.search
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
-
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView.OnEditorActionListener
 import androidx.core.view.get
-import androidx.core.widget.doOnTextChanged
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.BuildConfig
 import com.devrinth.launchpad.adapters.ResultAdapter
 import com.devrinth.launchpad.adapters.ResultScrollAdapter
-import com.devrinth.launchpad.adapters.SearchSuggestionListAdapter
 import com.devrinth.launchpad.search.external.ExternalSearch
 
 import com.devrinth.launchpad.search.plugins.*
@@ -30,10 +32,9 @@ import androidx.core.content.edit
 import androidx.core.view.isNotEmpty
 
 class SearchManager(
-    mContext: Context,
-    searchTextBox: EditText,
+    private val mContext: Context,
+    private val searchTextBox: EditText,
     private var resultRecyclerView: RecyclerView,
-    private var searchSuggestionsView: RecyclerView,
     private var searchCardLayout: LinearLayout
 ) {
 
@@ -44,7 +45,6 @@ class SearchManager(
     private var pluginList = arrayListOf<SearchPlugin>()
     private var pluginsMap = mapOf(
 
-        "search_suggestions" to SearchSuggestionsPlugin(mContext),
         "apps" to AppsPlugin(mContext),
         "contacts" to ContactsPlugin(mContext),
         "calculator" to CalculatorPlugin(mContext),
@@ -61,10 +61,6 @@ class SearchManager(
 
     private var displayedResults = mutableSetOf<ResultAdapter>()
 
-    private var searchSuggestions = ArrayList<ResultAdapter>()
-    private var searchSuggestionListAdapter: SearchSuggestionListAdapter
-
-    private var displayedSuggestions = mutableSetOf<ResultAdapter>()
 
     private var externalSearch : ExternalSearch = ExternalSearch(mContext)
 
@@ -78,31 +74,36 @@ class SearchManager(
     private val TAG : String = "PLUGIN MANAGER"
 
     init {
-        searchSuggestionsView.layoutManager = LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false)
         resultRecyclerView.layoutManager = LinearLayoutManager(mContext)
 
         reloadPlugins()
 
-        searchTextBox.doOnTextChanged { text, _, _, _ ->
-            searchQuery = text.toString().trim()
-            sharedPreferences.edit { putString("LAST_SEARCH_QUERY", searchQuery) }
-            processQuery()
-        }
+        val handler = Handler(Looper.getMainLooper())
+        searchTextBox.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                handler.removeCallbacksAndMessages(null)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                handler.postDelayed({
+                    searchQuery = s.toString().trim()
+                    sharedPreferences.edit { putString("LAST_SEARCH_QUERY", searchQuery) }
+                    processQuery()
+                }, 150)
+            }
+        })
         searchTextBox.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-               if ((resultRecyclerView.isNotEmpty()) && actionSearchOpen)
-                   resultRecyclerView[0].performClick()
+                if ((resultRecyclerView.isNotEmpty()) && actionSearchOpen) {
+                    resultRecyclerView[0].performClick()
+                    hideKeyboard()
+                }
                 return@OnEditorActionListener true
             }
             false
         })
-
-        if (!enabledPlugins!!.contains("int-search")) {
-            searchSuggestionsView.visibility = View.GONE
-        }
-
-        searchSuggestionListAdapter = SearchSuggestionListAdapter(searchSuggestions, mContext)
-        searchSuggestionsView.adapter = searchSuggestionListAdapter
 
         resultScrollAdapter = ResultScrollAdapter(resultArray, mContext)
         resultRecyclerView.adapter = resultScrollAdapter
@@ -138,6 +139,12 @@ class SearchManager(
         externalSearch.unloadPlugins()
     }
 
+    fun resumePlugins() {
+        pluginList.forEach {
+            it.pluginResume()
+        }
+    }
+
     /*
     *  PLUGIN LOADING
     *
@@ -164,17 +171,13 @@ class SearchManager(
 
                 if (!isInternalPlugin) {
 
-                    if (pluginName == "search_suggestions") {
-                        addSearchSuggestions(resultArray, query)
-                    } else {
-                        if (plugin.PRIORITY > 0) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                kotlinx.coroutines.delay((80 * (plugin.PRIORITY).toLong()))
-                                addResults(resultArray, query, pluginName)
-                            }
-                        } else {
+                    if (plugin.PRIORITY > 0) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            kotlinx.coroutines.delay((80 * (plugin.PRIORITY).toLong()))
                             addResults(resultArray, query, pluginName)
                         }
+                    } else {
+                        addResults(resultArray, query, pluginName)
                     }
                 } else {
                     // TODO: Internal Plugins
@@ -203,24 +206,6 @@ class SearchManager(
 
     }
 
-    private fun addSearchSuggestions(suggestions: List<ResultAdapter>, query: String) {
-        if (!searchQuery.equals(query, ignoreCase = true)) return
-
-        val newSuggestions = suggestions.filter { newSuggestion ->
-            !displayedSuggestions.contains(newSuggestion) &&
-            !searchSuggestions.any { existingSuggestion ->
-                isDuplicateSuggestion(existingSuggestion, newSuggestion)
-            }
-        }
-
-        if (newSuggestions.isNotEmpty()) {
-            val startIndex = searchSuggestions.size
-            searchSuggestions.addAll(newSuggestions)
-            displayedSuggestions.addAll(newSuggestions)
-            searchSuggestionListAdapter.notifyItemRangeInserted(startIndex, newSuggestions.size)
-        }
-    }
-
     private fun addResults(results: List<ResultAdapter>, query: String, plugin: String? = "default") {
         if (!searchQuery.equals(query, ignoreCase = true)) return
 
@@ -245,9 +230,6 @@ class SearchManager(
                existing.action1?.toString() == new.action1?.toString()
     }
 
-    private fun isDuplicateSuggestion(existing: ResultAdapter, new: ResultAdapter): Boolean {
-        return existing.value == new.value
-    }
 
     private fun processQuery() {
         val isTypingForward = searchQuery.length > previousQuery.length &&
@@ -257,7 +239,6 @@ class SearchManager(
         if (searchQuery.isEmpty()) {
             resultRecyclerView.visibility = View.GONE
             clearAllResults()
-            clearAllSuggestions()
             previousQuery = searchQuery
             return
         } else {
@@ -268,21 +249,12 @@ class SearchManager(
             filterExistingResultsForward()
         } else {
             clearAllResults()
-            clearAllSuggestions()
         }
 
         if (firstQuery && searchQuery.isNotEmpty()) {
             firstQuery = false
         }
 
-        if (firstQuery) {
-            searchSuggestionsView.visibility = View.GONE
-        } else {
-            searchSuggestionsView.visibility = View.VISIBLE
-            if (isTypingForward) {
-                filterExistingSuggestionsForward()
-            }
-        }
 
         externalSearch.sendQuery(searchQuery)
 
@@ -300,16 +272,6 @@ class SearchManager(
             resultArray.clear()
             displayedResults.clear()
             resultScrollAdapter.notifyItemRangeRemoved(0, count)
-        }
-    }
-
-    private fun clearAllSuggestions() {
-        if (searchSuggestions.isNotEmpty()) {
-            val count = searchSuggestions.size
-
-            searchSuggestions.clear()
-            displayedSuggestions.clear()
-            searchSuggestionListAdapter.notifyItemRangeRemoved(0, count)
         }
     }
 
@@ -331,28 +293,12 @@ class SearchManager(
         }
     }
 
-    private fun filterExistingSuggestionsForward() {
-        val iterator = searchSuggestions.iterator()
-        var index = 0
-        while (iterator.hasNext()) {
-            val suggestion = iterator.next()
-
-            if (!suggestionMatchesQuery(suggestion, searchQuery)) {
-
-                iterator.remove()
-                displayedSuggestions.remove(suggestion)
-                searchSuggestionListAdapter.notifyItemRemoved(index)
-            } else {
-                index++
-            }
-        }
-    }
-
     private fun resultMatchesQuery(result: ResultAdapter, query: String): Boolean {
         return result.value.contains(query, ignoreCase = true)
     }
 
-    private fun suggestionMatchesQuery(suggestion: ResultAdapter, query: String): Boolean {
-        return suggestion.value.contains(query, ignoreCase = true)
+    private fun hideKeyboard() {
+        val imm = mContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(searchTextBox.windowToken, 0)
     }
 }

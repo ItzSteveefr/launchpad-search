@@ -101,6 +101,10 @@ open class SearchPlugin(
         INIT = false
     }
 
+    open fun pluginResume() {
+        /* Optional default implementation */
+    }
+
     /**
      * Retrieves a plugin-specific setting value.
      *
