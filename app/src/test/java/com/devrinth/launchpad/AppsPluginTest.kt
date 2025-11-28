@@ -1,20 +1,32 @@
 package com.devrinth.launchpad
 
 import android.content.Context
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import com.devrinth.launchpad.search.plugins.AppsPlugin
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 class AppsPluginTest {
 
     private lateinit var appsPlugin: AppsPlugin
+    private lateinit var mockContext: Context
+    private lateinit var mockPackageManager: PackageManager
+    private lateinit var mockSharedPreferences: SharedPreferences
 
     @Before
     fun setup() {
-        val mockContext = mock(Context::class.java)
+        mockContext = mock(Context::class.java)
+        mockPackageManager = mock(PackageManager::class.java)
+        mockSharedPreferences = mock(SharedPreferences::class.java)
+
+        `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+        `when`(mockContext.getSharedPreferences("com.devrinth.launchpad_preferences", 0)).thenReturn(mockSharedPreferences)
+
         appsPlugin = AppsPlugin(mockContext)
         appsPlugin.appList = listOf(
             AppsPlugin.AppInfo("Google Chrome", "com.android.chrome"),
