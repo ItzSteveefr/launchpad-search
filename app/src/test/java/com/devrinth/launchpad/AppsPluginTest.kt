@@ -25,6 +25,7 @@ class AppsPluginTest {
         mockSharedPreferences = mock(SharedPreferences::class.java)
 
         `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+        `when`(mockContext.packageName).thenReturn("com.devrinth.launchpad")
         `when`(mockContext.getSharedPreferences("com.devrinth.launchpad_preferences", 0)).thenReturn(mockSharedPreferences)
 
         appsPlugin = AppsPlugin(mockContext)
