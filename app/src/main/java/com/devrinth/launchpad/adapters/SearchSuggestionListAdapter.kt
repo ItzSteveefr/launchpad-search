@@ -35,7 +35,9 @@ class SearchSuggestionListAdapter(private val mSuggestions: List<ResultAdapter>,
                 VoiceInteractionSessionService.RECEIVER_EXPORTED
             )
         } else {
-            mContext.registerReceiver(reloadReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_SHOW))
+            mContext.registerReceiver(reloadReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_SHOW), null, null,
+                VoiceInteractionSessionService.RECEIVER_EXPORTED
+            )
         }
     }
 
