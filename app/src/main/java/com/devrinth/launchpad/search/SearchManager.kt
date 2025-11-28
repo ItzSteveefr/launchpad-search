@@ -15,7 +15,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView.OnEditorActionListener
-import androidx.collection.LruCache
 import androidx.core.view.get
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,8 +64,6 @@ class SearchManager(
 
     private var externalSearch : ExternalSearch = ExternalSearch(mContext)
 
-    private val searchCache: LruCache<String, ArrayList<ResultAdapter>>
-
     private val sharedPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(mContext)
 
@@ -77,7 +74,6 @@ class SearchManager(
     private val TAG : String = "PLUGIN MANAGER"
 
     init {
-        searchCache = LruCache(50)
         resultRecyclerView.layoutManager = LinearLayoutManager(mContext)
 
         reloadPlugins()
@@ -95,7 +91,7 @@ class SearchManager(
                     searchQuery = s.toString().trim()
                     sharedPreferences.edit { putString("LAST_SEARCH_QUERY", searchQuery) }
                     processQuery()
-                }, 50)
+                }, 150)
             }
         })
         searchTextBox.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
@@ -194,7 +190,6 @@ class SearchManager(
         actionSearchOpen = sharedPreferences.getBoolean("setting_top_result_default", true)
         enabledPlugins = sharedPreferences.getStringSet("setting_search_plugins", pluginsMap.keys)
 
-        searchCache.evictAll()
         externalSearch.unloadPlugins()
         pluginList = arrayListOf()
 
@@ -226,7 +221,6 @@ class SearchManager(
             resultArray.addAll(newResults)
             displayedResults.addAll(newResults)
             resultScrollAdapter.notifyItemRangeInserted(startIndex, newResults.size)
-            searchCache.put(query, resultArray)
         }
     }
 
@@ -249,14 +243,6 @@ class SearchManager(
             return
         } else {
             resultRecyclerView.visibility = View.VISIBLE
-        }
-
-        val cachedResults = searchCache.get(searchQuery)
-        if (cachedResults != null) {
-            resultArray.clear()
-            resultArray.addAll(cachedResults)
-            resultScrollAdapter.notifyDataSetChanged()
-            return
         }
 
         if (isTypingForward) {
