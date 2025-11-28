@@ -28,6 +28,7 @@ class AppsPluginTest {
         `when`(mockContext.getSharedPreferences("com.devrinth.launchpad_preferences", 0)).thenReturn(mockSharedPreferences)
 
         appsPlugin = AppsPlugin(mockContext)
+        appsPlugin.pluginInit()
         appsPlugin.appList = listOf(
             AppsPlugin.AppInfo("Google Chrome", "com.android.chrome"),
             AppsPlugin.AppInfo("Gmail", "com.google.android.gm"),
