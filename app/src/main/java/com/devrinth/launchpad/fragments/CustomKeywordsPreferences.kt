@@ -31,9 +31,10 @@ class CustomKeywordsPreferences : PreferenceFragmentCompat() {
             val apps = pm.queryIntentActivities(mainIntent, 0)
 
             withContext(Dispatchers.Main) {
-                for (app in apps) {
-                    val appPreference = Preference(context)
-                    appPreference.title = app.loadLabel(pm)
+                if (isAdded) {
+                    for (app in apps) {
+                        val appPreference = Preference(context)
+                        appPreference.title = app.loadLabel(pm)
                     appPreference.icon = app.loadIcon(pm)
                     appPreference.key = app.activityInfo.packageName
 
@@ -63,6 +64,7 @@ class CustomKeywordsPreferences : PreferenceFragmentCompat() {
                         true
                     }
                     appCategory.addPreference(appPreference)
+                    }
                 }
             }
         }
