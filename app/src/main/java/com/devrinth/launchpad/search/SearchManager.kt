@@ -91,7 +91,7 @@ class SearchManager(
                     searchQuery = s.toString().trim()
                     sharedPreferences.edit { putString("LAST_SEARCH_QUERY", searchQuery) }
                     processQuery()
-                }, 75)
+                }, 150)
             }
         })
         searchTextBox.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
@@ -256,12 +256,10 @@ class SearchManager(
         }
 
 
-        CoroutineScope(Dispatchers.IO).launch {
-            externalSearch.sendQuery(searchQuery)
+        externalSearch.sendQuery(searchQuery)
 
-            pluginList.forEach { mPlugin ->
-                mPlugin.pluginProcess(searchQuery)
-            }
+        pluginList.forEach { mPlugin ->
+            mPlugin.pluginProcess(searchQuery)
         }
 
         previousQuery = searchQuery

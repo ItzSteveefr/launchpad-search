@@ -161,12 +161,15 @@ class SearchWindow(val context: Context) {
 
     fun showKeyboard() {
         if (sharedPreferences.getBoolean("setting_search_show_keyboard", true)) {
-            searchInput.isFocusableInTouchMode = true
-            searchInput.clearFocus()
-            searchInput.requestFocus()
-            val lManager =
-                context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            lManager.showSoftInput(searchInput, InputMethodManager.SHOW_IMPLICIT)
+            //searchInput.requestFocus()
+            searchInput.isFocusableInTouchMode = true // kb
+            searchInput.postDelayed({
+                searchInput.requestFocus()
+
+                val lManager =
+                    context.getSystemService(VoiceInteractionSessionService.INPUT_METHOD_SERVICE) as InputMethodManager
+                lManager.showSoftInput(searchInput, 0)
+            }, 160)
         }
     }
 
