@@ -20,9 +20,6 @@ import androidx.core.view.animation.PathInterpolatorCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.R
-import com.devrinth.launchpad.activities.SettingsActivity
-import com.devrinth.launchpad.adapters.PinnedActionAdapter
-import com.devrinth.launchpad.adapters.PinnedActionListAdapter
 import com.devrinth.launchpad.receivers.AssistantActionReceiver
 
 class SearchWindow(val context: Context) {
@@ -30,11 +27,6 @@ class SearchWindow(val context: Context) {
     private lateinit var searchInput : EditText
     private lateinit var resultsView : RecyclerView
 
-    private lateinit var pinnedResultView : RecyclerView
-    private lateinit var pinnedAdapter : PinnedActionListAdapter
-    private var pinnedArray = ArrayList<PinnedActionAdapter>()
-
-    private lateinit var searchSuggestionsView: RecyclerView
     private lateinit var launchpadMainLayout: LinearLayout
 
     private lateinit var mSearchManager: SearchManager
@@ -71,8 +63,6 @@ class SearchWindow(val context: Context) {
         searchInput = contentView.findViewById(R.id.search_input)
 
         searchCardLayout = contentView.findViewById(R.id.search_card_layout)
-
-        searchSuggestionsView = contentView.findViewById(R.id.search_suggestions_view)
 
         resultsView = contentView.findViewById(R.id.results_view)
 //            pinnedResultView = contentView.findViewById(R.id.pinned_apps_view)
@@ -146,7 +136,6 @@ class SearchWindow(val context: Context) {
             context,
             searchInput,
             resultsView,
-            searchSuggestionsView,
             searchCardLayout
         )
 
@@ -190,6 +179,10 @@ class SearchWindow(val context: Context) {
 
     fun reload() {
         mSearchManager.reloadPlugins()
+    }
+
+    fun resume() {
+        mSearchManager.resumePlugins()
     }
 
     // -- WINDOW FUNCTION

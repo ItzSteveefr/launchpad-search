@@ -42,18 +42,6 @@
 
                 </androidx.recyclerview.widget.RecyclerView>
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/ginormous_spacing" ></Space>
-                <androidx.recyclerview.widget.RecyclerView
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/search_suggestions_holder_height"
-                    android:id="@+id/search_suggestions_view"
-                    android:padding="8dp"
-                    android:visibility="gone">
-
-                </androidx.recyclerview.widget.RecyclerView>
                 <androidx.cardview.widget.CardView
                     android:fitsSystemWindows="true"
                     android:layout_width="match_parent"

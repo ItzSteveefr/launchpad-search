@@ -2,8 +2,10 @@ package com.devrinth.launchpad.search.plugins
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
+import androidx.preference.PreferenceManager
 import com.devrinth.launchpad.BuildConfig
 import com.devrinth.launchpad.adapters.ResultAdapter
 import com.devrinth.launchpad.search.SearchPlugin
@@ -17,18 +19,19 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
     override var ID = "apps"
 
-    private data class AppInfo(
+    internal data class AppInfo(
         val label: String,
         val packageName: String,
-        val icon: Drawable
+        val icon: Drawable? = null
     )
 
-    private var appList: List<AppInfo> = emptyList()
+    internal var appList: List<AppInfo> = emptyList()
     private lateinit var mPackageManager: PackageManager
     private var searchJob: Job? = null
     private val cacheFile by lazy {
         File(mContext.cacheDir, "app_cache.txt")
     }
+    internal val customKeywords = mutableMapOf<String, String>()
 
     override fun pluginInit() {
         mPackageManager = mContext.packageManager
@@ -73,7 +76,23 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
                 }
             }
         }
+        loadCustomKeywords()
         super.pluginInit()
+    }
+
+    private fun loadCustomKeywords() {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(mContext)
+        customKeywords.clear()
+        for (app in appList) {
+            val keyword = prefs.getString(app.packageName, null)
+            if (!keyword.isNullOrEmpty()) {
+                customKeywords[app.packageName] = keyword
+            }
+        }
+    }
+
+    override fun pluginResume() {
+        loadCustomKeywords()
     }
 
     override fun pluginProcess(query: String) {
@@ -90,25 +109,39 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
         }
     }
 
-    private suspend fun filterApps(query: String): List<ResultAdapter> {
+    internal suspend fun filterApps(query: String): List<ResultAdapter> {
         return withContext(Dispatchers.Default) {
-            val normalizedQuery = query.trim()
+            val normalizedQuery = query.trim().lowercase()
             if (normalizedQuery.isEmpty()) {
                 return@withContext emptyList()
             }
 
-            appList.filter { appInfo ->
-                StringUtils.fuzzyContains(normalizedQuery, appInfo.label) ||
-                        StringUtils.simpleContains(normalizedQuery, appInfo.packageName)
-            }.map { appInfo ->
-                ResultAdapter(
-                    appInfo.label,
-                    null,
-                    appInfo.icon,
-                    IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
-                    null
-                )
+            val keywordMatches = appList.filter { app ->
+                customKeywords.any { (packageName, keyword) ->
+                    app.packageName == packageName && keyword.startsWith(normalizedQuery)
+                }
             }
+            val prefixMatches = appList.filter {
+                it.label.lowercase().startsWith(normalizedQuery)
+            }
+            val wordPrefixMatches = appList.filter {
+                it.label.split(" ").any { word -> word.lowercase().startsWith(normalizedQuery) }
+            }
+            val fuzzyMatches = appList.filter {
+                StringUtils.fuzzyContains(normalizedQuery, it.label)
+            }
+
+            (keywordMatches + prefixMatches + wordPrefixMatches + fuzzyMatches)
+                .distinctBy { it.packageName }
+                .map { appInfo ->
+                    ResultAdapter(
+                        appInfo.label,
+                        null,
+                        appInfo.icon,
+                        IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
+                        null
+                    )
+                }
         }
     }
 }

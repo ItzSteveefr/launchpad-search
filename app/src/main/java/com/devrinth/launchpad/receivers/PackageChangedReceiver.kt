@@ -7,8 +7,7 @@ import java.io.File
 
 class PackageChangedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (
-            intent.action == Intent.ACTION_PACKAGE_ADDED ||
+        if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
             intent.action == Intent.ACTION_PACKAGE_REMOVED ||
             intent.action == Intent.ACTION_PACKAGE_REPLACED
         ) {

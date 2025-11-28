@@ -9,9 +9,13 @@ import org.junit.Assert.*
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+import com.devrinth.launchpad.utils.StringUtils
+
 class PluginUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun fuzzyContains_isCorrect() {
+        assertTrue(StringUtils.fuzzyContains("hlwd", "hello world"))
+        assertTrue(StringUtils.fuzzyContains("wrld", "hello world"))
+        assertFalse(StringUtils.fuzzyContains("dlrow", "hello world"))
     }
 }
