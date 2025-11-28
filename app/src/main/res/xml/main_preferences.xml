@@ -6,7 +6,7 @@
         app:title="Search">
 
         <Preference
-            android:icon="@drawable/baseline_vpn_key_24"
+            android:icon="@drawable/baseline_search_24"
             app:key="setting_custom_keywords"
             app:title="Custom Keywords"
             app:summary="Set custom keywords for your apps">
