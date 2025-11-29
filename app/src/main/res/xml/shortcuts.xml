@@ -16,7 +16,7 @@
     <shortcut
         android:shortcutId="settings_shortcut"
         android:enabled="true"
-        android:icon="@drawable/ic_settings_24"
+        android:icon="@mipmap/ic_launcher"
         android:shortcutShortLabel="@string/shortcut_settings_label"
         android:shortcutLongLabel="@string/shortcut_settings_long_label">
 
