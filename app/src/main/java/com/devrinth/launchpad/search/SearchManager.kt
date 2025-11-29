@@ -229,7 +229,7 @@ class SearchManager(
     }
 
 
-    private fun processQuery() {
+    internal fun processQuery() {
         TransitionManager.beginDelayedTransition(searchCardLayout)
         if (searchQuery.isEmpty()) {
             resultRecyclerView.visibility = View.GONE
@@ -248,7 +248,7 @@ class SearchManager(
         }
     }
 
-    private fun clearAllResults() {
+    internal fun clearAllResults() {
         if (resultArray.isNotEmpty()) {
             val count = resultArray.size
             resultArray.clear()
