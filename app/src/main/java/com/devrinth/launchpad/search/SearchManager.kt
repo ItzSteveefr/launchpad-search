@@ -241,19 +241,20 @@ class SearchManager(
 
         if (isTypingForward) {
             filterExistingResultsForward()
+            externalSearch.sendQuery(searchQuery)
+            pluginList.forEach { mPlugin ->
+                mPlugin.pluginProcess(searchQuery)
+            }
         } else {
-            processQuery()
+            clearAllResults()
+            externalSearch.sendQuery(searchQuery)
+            pluginList.forEach { mPlugin ->
+                mPlugin.pluginProcess(searchQuery)
+            }
         }
 
         if (firstQuery && searchQuery.isNotEmpty()) {
             firstQuery = false
-        }
-
-
-        externalSearch.sendQuery(searchQuery)
-
-        pluginList.forEach { mPlugin ->
-            mPlugin.pluginProcess(searchQuery)
         }
 
         previousQuery = searchQuery
