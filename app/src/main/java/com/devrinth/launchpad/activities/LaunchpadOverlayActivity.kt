@@ -2,7 +2,9 @@ package com.devrinth.launchpad.activities
 
 import android.app.Activity
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowInsetsController
 import android.view.WindowManager
 import com.devrinth.launchpad.modals.OverlayState
 import com.devrinth.launchpad.search.SearchWindow
@@ -20,7 +22,15 @@ class LaunchpadOverlayActivity : Activity() {
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
         )
-        @Suppress("DEPRECATION")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.hide(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE)
+        } else {
+            @Suppress("DEPRECATION")
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
+        }
         window.statusBarColor = Color.TRANSPARENT
 
         mSearchWindow = SearchWindow(this)
@@ -44,6 +54,7 @@ class LaunchpadOverlayActivity : Activity() {
         mSearchWindow.unload()
         OverlayState.isOverlayActive = false
     }
+
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         mSearchWindow.hideWindow()
@@ -53,6 +64,7 @@ class LaunchpadOverlayActivity : Activity() {
         super.onResume()
         mSearchWindow.resume()
     }
+
     override fun onPause() {
         super.onPause()
         finish()

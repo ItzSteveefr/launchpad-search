@@ -2,7 +2,6 @@ package com.devrinth.launchpad.search
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
@@ -24,14 +23,14 @@ import com.devrinth.launchpad.receivers.AssistantActionReceiver
 
 class SearchWindow(val context: Context) {
 
-    private lateinit var searchInput : EditText
-    private lateinit var resultsView : RecyclerView
+    private lateinit var searchInput: EditText
+    private lateinit var resultsView: RecyclerView
 
     private lateinit var launchpadMainLayout: LinearLayout
 
     private lateinit var mSearchManager: SearchManager
 
-    private var reloadReceiver : AssistantActionReceiver = AssistantActionReceiver {
+    private var reloadReceiver: AssistantActionReceiver = AssistantActionReceiver {
         mSearchManager.reloadPlugins()
     }
 
@@ -39,12 +38,12 @@ class SearchWindow(val context: Context) {
     private var anim = AnimationUtils.loadAnimation(context, R.anim.pop_up)
     private var animOut = AnimationUtils.loadAnimation(context, R.anim.pop_down)
 
-    private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val sharedPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
-    private var lastUiMode: Int = context.resources.configuration.uiMode
     private var isAlternateLayout: Boolean
 
-    private lateinit var mContentView : View
+    private lateinit var mContentView: View
     private lateinit var searchCardLayout: LinearLayout
 
     private var windowCloseAction: (() -> Unit)? = null
@@ -54,10 +53,11 @@ class SearchWindow(val context: Context) {
         anim.interpolator = interpolator
         animOut.interpolator = interpolator
 
-        isAlternateLayout = sharedPreferences.getBoolean("setting_layout_window_alternate", false)
+        isAlternateLayout =
+            sharedPreferences.getBoolean("setting_layout_window_alternate", false)
     }
 
-    private fun initViews(contentView : View) {
+    private fun initViews(contentView: View) {
 
         launchpadMainLayout = contentView.findViewById(R.id.launchpad_main_layout)
         searchInput = contentView.findViewById(R.id.search_input)
@@ -65,44 +65,20 @@ class SearchWindow(val context: Context) {
         searchCardLayout = contentView.findViewById(R.id.search_card_layout)
 
         resultsView = contentView.findViewById(R.id.results_view)
-//            pinnedResultView = contentView.findViewById(R.id.pinned_apps_view)
-//            pinnedResultView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private fun initListeners() {
-        if (Build.VERSION.SDK_INT >= 33) {
-            context.registerReceiver(reloadReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_SHOW),
-                VoiceInteractionSessionService.RECEIVER_EXPORTED
-            )
-        } else {
-            context.registerReceiver(reloadReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_SHOW))
-        }
-
+        context.registerReceiver(
+            reloadReceiver,
+            IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_SHOW),
+            Context.RECEIVER_EXPORTED
+        )
         if (sharedPreferences.getBoolean("setting_close_on_outclick", false)) {
             launchpadMainLayout.setOnClickListener {
                 this.hideWindow()
             }
         }
-
-//            pinnedAdapter = PinnedActionListAdapter(pinnedArray, context)
-//            pinnedResultView.adapter = pinnedAdapter
-//
-//            pinnedArray.add(
-//                PinnedActionAdapter(
-//                    "android.intent.action.VIEW",
-//                    "https://google.com",
-//                    AppCompatResources.getDrawable(context, R.drawable.web_search_24)
-//                `)
-//            )
-//            pinnedArray.add(
-//                PinnedActionAdapter(
-//                    "android.intent.action.VIEW",
-//                    "https://google.com",
-//                    AppCompatResources.getDrawable(context, R.drawable.baseline_settings_24)
-//                )
-//            )`
-//            pinnedAdapter.notifyDataSetChanged()
     }
 
     // PUBLIC
@@ -111,11 +87,12 @@ class SearchWindow(val context: Context) {
     }
 
     fun createLaunchpadWindow(window: Window?) {
-        val inflater = context.getSystemService(VoiceInteractionSessionService.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val inflater =
+            context.getSystemService(VoiceInteractionSessionService.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
         val contentView: View = if (isAlternateLayout) {
-            inflater.inflate(R.layout.search_layout_reverse, null) }
-        else {
+            inflater.inflate(R.layout.search_layout_reverse, null)
+        } else {
             inflater.inflate(R.layout.search_layout, null)
         }
 
@@ -123,11 +100,11 @@ class SearchWindow(val context: Context) {
         initViews(contentView)
 
         if (window != null) {
-            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE) // kb
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
             if (sharedPreferences.getBoolean("setting_layout_blur_behind", false)) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    window.attributes?.blurBehindRadius = 25
+                    window.attributes.blurBehindRadius = 25
                 }
             }
             window.attributes = window.attributes
@@ -155,19 +132,18 @@ class SearchWindow(val context: Context) {
     }
 
 
-    fun getLaunchpadWindow() : View {
+    fun getLaunchpadWindow(): View {
         return mContentView
     }
 
     fun showKeyboard() {
         if (sharedPreferences.getBoolean("setting_search_show_keyboard", true)) {
-            //searchInput.requestFocus()
-            searchInput.isFocusableInTouchMode = true // kb
+            searchInput.isFocusableInTouchMode = true
             searchInput.postDelayed({
                 searchInput.requestFocus()
 
                 val lManager =
-                    context.getSystemService(VoiceInteractionSessionService.INPUT_METHOD_SERVICE) as InputMethodManager
+                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 lManager.showSoftInput(searchInput, 0)
             }, 160)
         }
@@ -191,6 +167,7 @@ class SearchWindow(val context: Context) {
             mContentView.startAnimation(anim)
 
     }
+
     fun hideWindow() {
         mContentView.startAnimation(animOut)
         mContentView.postOnAnimationDelayed({
