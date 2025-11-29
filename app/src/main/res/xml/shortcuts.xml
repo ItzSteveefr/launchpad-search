@@ -13,4 +13,18 @@
 
 </shortcut>
 
-    </shortcuts>
+    <shortcut
+        android:shortcutId="settings_shortcut"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_settings_label"
+        android:shortcutLongLabel="@string/shortcut_settings_long_label">
+
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="com.devrinth.launchpad"
+            android:targetClass="com.devrinth.launchpad.activities.SettingsActivity" />
+
+    </shortcut>
+
+</shortcuts>
