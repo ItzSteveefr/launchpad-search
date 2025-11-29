@@ -72,7 +72,7 @@ class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
                                     shortcut.shortLabel ?: shortcut.longLabel ?: "",
                                     appInfo.loadLabel(mPackageManager),
                                     mLauncherApps.getShortcutIconDrawable(shortcut, 0),
-                                    mLauncherApps.getShortcutIntent(shortcut)
+                                    mLauncherApps.getMainActivityLaunchIntent(shortcut.packageName, null, shortcut.userHandle)
                                 )
                             )
                         } catch (_: PackageManager.NameNotFoundException) {
