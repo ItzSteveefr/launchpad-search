@@ -103,7 +103,6 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
         searchJob?.cancel()
         searchJob = CoroutineScope(Dispatchers.Main).launch {
-            delay(150) // Debounce
             val results = filterApps(query)
             pluginResult(results, query)
         }
@@ -116,32 +115,23 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
                 return@withContext emptyList()
             }
 
-            val keywordMatches = appList.filter { app ->
-                customKeywords.any { (packageName, keyword) ->
-                    app.packageName == packageName && keyword.startsWith(normalizedQuery)
-                }
+            appList.filter { app ->
+                val customKeyword = customKeywords[app.packageName]
+                (customKeyword != null && customKeyword.startsWith(normalizedQuery)) ||
+                app.label.lowercase().startsWith(normalizedQuery) ||
+                app.label.split(" ").any { it.lowercase().startsWith(normalizedQuery) } ||
+                StringUtils.fuzzyContains(normalizedQuery, app.label)
             }
-            val prefixMatches = appList.filter {
-                it.label.lowercase().startsWith(normalizedQuery)
+            .distinctBy { it.packageName }
+            .map { appInfo ->
+                ResultAdapter(
+                    appInfo.label,
+                    null,
+                    appInfo.icon,
+                    IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
+                    null
+                )
             }
-            val wordPrefixMatches = appList.filter {
-                it.label.split(" ").any { word -> word.lowercase().startsWith(normalizedQuery) }
-            }
-            val fuzzyMatches = appList.filter {
-                StringUtils.fuzzyContains(normalizedQuery, it.label)
-            }
-
-            (keywordMatches + prefixMatches + wordPrefixMatches + fuzzyMatches)
-                .distinctBy { it.packageName }
-                .map { appInfo ->
-                    ResultAdapter(
-                        appInfo.label,
-                        null,
-                        appInfo.icon,
-                        IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
-                        null
-                    )
-                }
         }
     }
 }
