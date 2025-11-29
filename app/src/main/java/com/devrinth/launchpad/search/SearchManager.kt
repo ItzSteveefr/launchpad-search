@@ -246,6 +246,25 @@ class SearchManager(
         pluginList.forEach { mPlugin ->
             mPlugin.pluginProcess(searchQuery)
         }
+        if (isTypingForward) {
+            filterExistingResultsForward()
+            externalSearch.sendQuery(searchQuery)
+            pluginList.forEach { mPlugin ->
+                mPlugin.pluginProcess(searchQuery)
+            }
+        } else {
+            clearAllResults()
+            externalSearch.sendQuery(searchQuery)
+            pluginList.forEach { mPlugin ->
+                mPlugin.pluginProcess(searchQuery)
+            }
+        }
+
+        if (firstQuery && searchQuery.isNotEmpty()) {
+            firstQuery = false
+        }
+
+        previousQuery = searchQuery
     }
 
     private fun clearAllResults() {
