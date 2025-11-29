@@ -6,7 +6,7 @@ import androidx.preference.PreferenceManager
 
 object ThemeManager {
 
-    private fun applyTheme(theme: String) {
+    fun applyTheme(theme: String) {
         when (theme) {
             "light" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             "dark" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
