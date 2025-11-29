@@ -49,7 +49,6 @@ class SearchManager(
         "contacts" to ContactsPlugin(mContext),
         "calculator" to CalculatorPlugin(mContext),
         "units" to UnitConversionPlugin(mContext),
-        "settings" to SettingsPlugin(mContext),
         "shortcuts" to ShortcutsPlugin(mContext),
 
     )
@@ -78,20 +77,15 @@ class SearchManager(
 
         reloadPlugins()
 
-        val handler = Handler(Looper.getMainLooper())
         searchTextBox.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                handler.removeCallbacksAndMessages(null)
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                handler.postDelayed({
-                    searchQuery = s.toString().trim()
-                    sharedPreferences.edit { putString("LAST_SEARCH_QUERY", searchQuery) }
-                    processQuery()
-                }, 150)
+                searchQuery = s.toString().trim()
+                sharedPreferences.edit { putString("LAST_SEARCH_QUERY", searchQuery) }
+                processQuery()
             }
         })
         searchTextBox.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
@@ -248,7 +242,7 @@ class SearchManager(
         if (isTypingForward) {
             filterExistingResultsForward()
         } else {
-            clearAllResults()
+            processQuery()
         }
 
         if (firstQuery && searchQuery.isNotEmpty()) {
