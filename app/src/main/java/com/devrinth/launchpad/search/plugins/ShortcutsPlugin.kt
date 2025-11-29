@@ -66,15 +66,18 @@ class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
                     if (shortcut.isEnabled) {
                         try {
                             val appInfo =
-                                mLauncherApps.getApplicationInfo(shortcut.packageName, 0, profile)
-                            shortcuts.add(
-                                Shortcut(
-                                    shortcut.shortLabel ?: shortcut.longLabel ?: "",
-                                    appInfo.loadLabel(mPackageManager),
-                                    mLauncherApps.getShortcutIconDrawable(shortcut, 0),
-                                    mPackageManager.getLaunchIntentForPackage(shortcut.`package`)
-                                )
-                            )
+                                mLauncherApps.getApplicationInfo(shortcut.`package`, 0, profile)
+                            mPackageManager.getLaunchIntentForPackage(shortcut.`package`)
+                                ?.let { intent ->
+                                    shortcuts.add(
+                                        Shortcut(
+                                            shortcut.shortLabel ?: shortcut.longLabel ?: "",
+                                            appInfo.loadLabel(mPackageManager),
+                                            mLauncherApps.getShortcutIconDrawable(shortcut, 0),
+                                            intent
+                                        )
+                                    )
+                                }
                         } catch (_: PackageManager.NameNotFoundException) {
                         }
                     }
