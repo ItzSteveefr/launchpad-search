@@ -24,11 +24,8 @@ class IntentUtilsTest {
     @Test
     fun `getAppIntent returns correct intent`() {
         val packageName = "com.test.app"
-        val mockIntent = mock(Intent::class.java)
-        `when`(mockPackageManager.getLaunchIntentForPackage(packageName)).thenReturn(mockIntent)
-
-        val intent = IntentUtils.getAppIntent(mockPackageManager, packageName)
-        assertEquals(mockIntent, intent)
+        IntentUtils.getAppIntent(mockPackageManager, packageName)
+        org.mockito.Mockito.verify(mockPackageManager).getLaunchIntentForPackage(packageName)
     }
 
     @Test

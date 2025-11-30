@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 class CustomKeywordsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _apps = MutableLiveData<List<AppKeyword>>()
+    private val _apps = MutableLiveData<List<AppKeyword>>(emptyList())
     val apps: LiveData<List<AppKeyword>> = _apps
 
     private val sharedPreferences: SharedPreferences =
