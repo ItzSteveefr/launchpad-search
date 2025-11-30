@@ -30,6 +30,7 @@ class CustomKeywordsViewModelTest {
 
         `when`(mockApplication.getSharedPreferences("com.devrinth.launchpad_preferences", 0)).thenReturn(mockSharedPreferences)
         `when`(mockSharedPreferences.edit()).thenReturn(mockEditor)
+        `when`(androidx.preference.PreferenceManager.getDefaultSharedPreferences(mockApplication)).thenReturn(mockSharedPreferences)
 
         viewModel = CustomKeywordsViewModel(mockApplication)
     }

@@ -54,7 +54,9 @@ class AppsPluginTest {
     @Test
     fun `test prefix search`() = runBlocking {
         val results = appsPlugin.filterApps("goo")
-        assertEquals(3, results.size)
+        assertEquals(2, results.size)
+        assertEquals("Google Chrome", results[0].value)
+        assertEquals("Google Maps", results[1].value)
     }
 
     @Test
@@ -79,6 +81,7 @@ class AppsPluginTest {
 
     @Test
     fun `test app list is loaded from cache`() {
+        appsPlugin.appList = emptyList()
         cacheFile.writeText("Test App|com.test.app\n")
         appsPlugin.pluginInit()
         assertEquals(1, appsPlugin.appList.size)
