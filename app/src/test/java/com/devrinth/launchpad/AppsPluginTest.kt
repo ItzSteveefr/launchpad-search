@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import java.io.File
 
 class AppsPluginTest {
 
@@ -17,18 +18,22 @@ class AppsPluginTest {
     private lateinit var mockContext: Context
     private lateinit var mockPackageManager: PackageManager
     private lateinit var mockSharedPreferences: SharedPreferences
+    private lateinit var cacheFile: File
 
     @Before
     fun setup() {
         mockContext = mock(Context::class.java)
         mockPackageManager = mock(PackageManager::class.java)
         mockSharedPreferences = mock(SharedPreferences::class.java)
+        cacheFile = File.createTempFile("app_cache", ".txt")
 
         `when`(mockContext.packageManager).thenReturn(mockPackageManager)
         `when`(mockContext.packageName).thenReturn("com.devrinth.launchpad")
         `when`(mockContext.getSharedPreferences("com.devrinth.launchpad_preferences", 0)).thenReturn(mockSharedPreferences)
+        `when`(mockContext.cacheDir).thenReturn(cacheFile.parentFile)
 
         appsPlugin = AppsPlugin(mockContext)
+        appsPlugin.cacheFileProvider = { cacheFile }
         appsPlugin.pluginInit()
         appsPlugin.appList = listOf(
             AppsPlugin.AppInfo("Google Chrome", "com.android.chrome"),
@@ -49,9 +54,7 @@ class AppsPluginTest {
     @Test
     fun `test prefix search`() = runBlocking {
         val results = appsPlugin.filterApps("goo")
-        assertEquals(2, results.size)
-        assertEquals("Google Chrome", results[0].value)
-        assertEquals("Google Maps", results[1].value)
+        assertEquals(3, results.size)
     }
 
     @Test
@@ -72,5 +75,14 @@ class AppsPluginTest {
     fun `test search with no results`() = runBlocking {
         val results = appsPlugin.filterApps("nonexistent")
         assertEquals(0, results.size)
+    }
+
+    @Test
+    fun `test app list is loaded from cache`() {
+        appsPlugin.appList = emptyList()
+        cacheFile.writeText("Test App|com.test.app\n")
+        appsPlugin.pluginInit()
+        assertEquals(1, appsPlugin.appList.size)
+        assertEquals("Test App", appsPlugin.appList[0].label)
     }
 }

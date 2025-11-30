@@ -20,7 +20,8 @@ class LaunchpadTileService : TileService() {
     override fun onStartListening() {
         super.onStartListening()
         qsTile.state = Tile.STATE_ACTIVE
-        qsTile.label = baseContext.resources.getString(R.string.shortcut_short_label) // Name shown in Quick Settings
+        qsTile.label =
+            baseContext.resources.getString(R.string.shortcut_short_label) // Name shown in Quick Settings
         qsTile.icon = Icon.createWithResource(this, R.drawable.shortcut_icon) // Set icon
         qsTile.updateTile()
     }
@@ -33,23 +34,23 @@ class LaunchpadTileService : TileService() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        if (Build.VERSION.SDK_INT >= 34) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
             startActivityAndCollapse(pendingIntent)
         } else {
+            @Suppress("DEPRECATION")
             startActivityAndCollapse(intent)
         }
     }
 
     override fun onTileRemoved() {
         super.onTileRemoved()
-        qsTile.state = Tile.STATE_UNAVAILABLE
+        qsTile.state = Tile.STATE_INACTIVE
         qsTile.updateTile()
     }
 

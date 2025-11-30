@@ -12,18 +12,31 @@ class CalculatorPlugin(mContext: Context) : SearchPlugin(mContext) {
     override var ID = "calculator"
     override var PRIORITY = 1
 
+    // Regex to quickly check if the query is a valid math expression
+    private val mathRegex = Regex("^[\\d\\s()+\\-*/.^%]+\$")
+
+
     override fun pluginProcess(query: String) {
         super.pluginProcess(query)
 
+        if (query.length < 3 || !mathRegex.matches(query)) {
+            pluginResult(emptyList(), "")
+            return
+        }
+
         try {
-            pluginResult(arrayListOf(ResultAdapter(
-                    Keval.eval(query).toString(),
-                    query,
-                    AppCompatResources.getDrawable(mContext, R.drawable.baseline_calculate_24),
-                    null,
-                    null
-                ))
-            , query)
+            val result = Keval.eval(query)
+            pluginResult(
+                arrayListOf(
+                    ResultAdapter(
+                        result.toString(),
+                        query,
+                        AppCompatResources.getDrawable(mContext, R.drawable.baseline_calculate_24),
+                        null,
+                        null
+                    )
+                ), query
+            )
         } catch (e: Exception) {
             pluginResult(emptyList(), "")
         }

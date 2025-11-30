@@ -11,11 +11,9 @@ import android.service.voice.VoiceInteractionSession
 import android.service.voice.VoiceInteractionSessionService
 import android.view.View
 import android.widget.Toast
-
 import androidx.preference.PreferenceManager
 import com.devrinth.launchpad.R
 import com.devrinth.launchpad.modals.OverlayState
-
 import com.devrinth.launchpad.receivers.AssistantActionReceiver
 import com.devrinth.launchpad.search.SearchWindow
 
@@ -23,33 +21,25 @@ class LaunchpadSessionService : VoiceInteractionSessionService() {
     override fun onNewSession(args: Bundle?): VoiceInteractionSession {
         return MyVoiceInteractionSession(this)
     }
+
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private class MyVoiceInteractionSession(context: Context?) :
         VoiceInteractionSession(context) {
 
-        private var hideReceiver : AssistantActionReceiver = AssistantActionReceiver {
+        private var hideReceiver: AssistantActionReceiver = AssistantActionReceiver {
             this.finish()
         }
         private val sharedPreferences: SharedPreferences
         private var lastUiMode: Int
+        private var isReceiverRegistered = false
 
         private var mSearchWindow: SearchWindow
 
         init {
-
             mSearchWindow = SearchWindow(context!!)
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-
             lastUiMode = context.resources.configuration.uiMode
-
-            if (Build.VERSION.SDK_INT >= 33) {
-                context.registerReceiver(hideReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_HIDE), RECEIVER_EXPORTED)
-            } else {
-                context.registerReceiver(hideReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_HIDE))
-            }
-
             mSearchWindow.onWindowClose { this.finish() }
-
         }
 
         override fun finish() {
@@ -64,6 +54,10 @@ class LaunchpadSessionService : VoiceInteractionSessionService() {
             }
             lastUiMode = context.resources.configuration.uiMode
             mSearchWindow.hideWindow()
+            if (isReceiverRegistered) {
+                context.unregisterReceiver(hideReceiver)
+                isReceiverRegistered = false
+            }
         }
 
         override fun onCreateContentView(): View {
@@ -76,13 +70,28 @@ class LaunchpadSessionService : VoiceInteractionSessionService() {
         override fun onShow(args: Bundle?, flags: Int) {
             super.onShow(args, flags)
             if (OverlayState.isOverlayActive) {
-                Toast.makeText(context,
-                    context.getString(R.string.general_warning_assistant_service), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.general_warning_assistant_service),
+                    Toast.LENGTH_SHORT
+                ).show()
                 this.finish()
             }
+            if (Build.VERSION.SDK_INT >= 33) {
+                context.registerReceiver(
+                    hideReceiver,
+                    IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_HIDE),
+                    RECEIVER_EXPORTED
+                )
+            } else {
+                context.registerReceiver(
+                    hideReceiver,
+                    IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_HIDE)
+                )
+            }
+            isReceiverRegistered = true
             mSearchWindow.showWindow()
             mSearchWindow.showKeyboard()
         }
-
     }
 }

@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.LauncherApps
 import android.content.pm.PackageManager
-import android.content.pm.ShortcutInfo
-import android.os.Build
+import android.graphics.drawable.Drawable
 import com.devrinth.launchpad.BuildConfig
 import com.devrinth.launchpad.R
 import com.devrinth.launchpad.adapters.ResultAdapter
@@ -14,8 +13,10 @@ import com.devrinth.launchpad.utils.IntentUtils
 import com.devrinth.launchpad.utils.StringUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
@@ -23,8 +24,14 @@ class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
     private lateinit var mPackageManager: PackageManager
     private lateinit var mLauncherApps: LauncherApps
+    private var searchJob: Job? = null
 
-    private var isProcessing = false
+    private data class Shortcut(
+        val label: CharSequence,
+        val appLabel: CharSequence,
+        val icon: Drawable?,
+        val intent: Intent
+    )
 
     override fun pluginInit() {
         mPackageManager = mContext.packageManager
@@ -33,47 +40,91 @@ class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
     }
 
     override fun pluginProcess(query: String) {
-        if (!INIT || query.isEmpty() || query.length < 2 || isProcessing) {
+        if (!INIT || query.length < 2) {
             pluginResult(emptyList(), "")
             return
         }
-        isProcessing = true
-
-        CoroutineScope(Dispatchers.Main).launch {
+        searchJob?.cancel()
+        searchJob = CoroutineScope(Dispatchers.Main).launch {
             pluginResult(filterShortcuts(query), query)
-            isProcessing = false
         }
     }
 
     private suspend fun filterShortcuts(query: String): List<ResultAdapter> {
         return withContext(Dispatchers.Default) {
-            val results = mutableListOf<ResultAdapter>()
+            val queryLower = query.lowercase()
+            val shortcuts = mutableListOf<Shortcut>()
 
-            val legacyIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
-            val legacyShortcuts = mPackageManager.queryIntentActivities(legacyIntent, 0)
-
-            legacyShortcuts.forEach { ri ->
-                if (ri.activityInfo.packageName != BuildConfig.APPLICATION_ID) {
-                    val label = ri.loadLabel(mPackageManager).toString()
-                    val appLabel = mPackageManager.getApplicationLabel(
-                        mPackageManager.getApplicationInfo(ri.activityInfo.packageName, 0)
-                    ).toString()
-
-                    if ( StringUtils.anyFuzzyContains(query, arrayListOf(label, appLabel))) {
-                        results.add(
-                            ResultAdapter(
-                                label,
-                                mContext.getString(R.string.plugin_shortcuts_query).format(appLabel),
-                                ri.activityInfo.loadIcon(mPackageManager),
-                                IntentUtils.getShortcutIntent(ri.activityInfo.packageName, ri.activityInfo.name),
-                                null
-                            )
-                        )
+            // Dynamic and Pinned Shortcuts
+            val queryParams = LauncherApps.ShortcutQuery()
+                .setQueryFlags(
+                    LauncherApps.ShortcutQuery.FLAG_MATCH_DYNAMIC
+                            or LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED
+                )
+            mLauncherApps.getProfiles()?.forEach { profile ->
+                mLauncherApps.getShortcuts(queryParams, profile)?.forEach { shortcut ->
+                    if (shortcut.isEnabled) {
+                        try {
+                            val appInfo =
+                                mLauncherApps.getApplicationInfo(shortcut.`package`, 0, profile)
+                            mPackageManager.getLaunchIntentForPackage(shortcut.`package`)
+                                ?.let { intent ->
+                                    shortcuts.add(
+                                        Shortcut(
+                                            shortcut.shortLabel ?: shortcut.longLabel ?: "",
+                                            appInfo.loadLabel(mPackageManager),
+                                            mLauncherApps.getShortcutIconDrawable(shortcut, 0),
+                                            intent
+                                        )
+                                    )
+                                }
+                        } catch (_: PackageManager.NameNotFoundException) {
+                        }
                     }
                 }
             }
-            results
+
+
+            // Legacy Shortcuts
+            val legacyIntent = Intent(Intent.ACTION_CREATE_SHORTCUT)
+            mPackageManager.queryIntentActivities(legacyIntent, 0).forEach { ri ->
+                if (ri.activityInfo.packageName != BuildConfig.APPLICATION_ID) {
+                    try {
+                        shortcuts.add(
+                            Shortcut(
+                                ri.loadLabel(mPackageManager),
+                                mPackageManager.getApplicationLabel(
+                                    mPackageManager.getApplicationInfo(
+                                        ri.activityInfo.packageName,
+                                        0
+                                    )
+                                ),
+                                ri.loadIcon(mPackageManager),
+                                IntentUtils.getShortcutIntent(
+                                    ri.activityInfo.packageName,
+                                    ri.activityInfo.name
+                                )
+                            )
+                        )
+                    } catch (_: PackageManager.NameNotFoundException) {
+                    }
+                }
+            }
+            shortcuts
+                .filter {
+                    StringUtils.fuzzyContains(queryLower, it.label.toString()) ||
+                            StringUtils.fuzzyContains(queryLower, it.appLabel.toString())
+                }
+                .map {
+                    ResultAdapter(
+                        it.label.toString(),
+                        mContext.getString(R.string.plugin_shortcuts_query)
+                            .format(it.appLabel),
+                        it.icon,
+                        it.intent,
+                        null
+                    )
+                }
         }
     }
-
 }

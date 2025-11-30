@@ -2,7 +2,6 @@ package com.devrinth.launchpad.search.plugins
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import androidx.preference.PreferenceManager
@@ -28,9 +27,8 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
     internal var appList: List<AppInfo> = emptyList()
     private lateinit var mPackageManager: PackageManager
     private var searchJob: Job? = null
-    private val cacheFile by lazy {
-        File(mContext.cacheDir, "app_cache.txt")
-    }
+    internal var cacheFileProvider: () -> File = { File(mContext.cacheDir, "app_cache.txt") }
+    private val cacheFile by lazy { cacheFileProvider() }
     internal val customKeywords = mutableMapOf<String, String>()
 
     override fun pluginInit() {
@@ -52,6 +50,7 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
                                 )
                             )
                         } catch (_: PackageManager.NameNotFoundException) {
+                            // App was uninstalled, ignore
                         }
                     }
                 }
@@ -75,8 +74,8 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
                     }
                 }
             }
+            loadCustomKeywords()
         }
-        loadCustomKeywords()
         super.pluginInit()
     }
 
@@ -115,23 +114,27 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
                 return@withContext emptyList()
             }
 
-            appList.filter { app ->
-                val customKeyword = customKeywords[app.packageName]
-                (customKeyword != null && customKeyword.startsWith(normalizedQuery)) ||
-                app.label.lowercase().startsWith(normalizedQuery) ||
-                app.label.split(" ").any { it.lowercase().startsWith(normalizedQuery) } ||
-                StringUtils.fuzzyContains(normalizedQuery, app.label)
-            }
-            .distinctBy { it.packageName }
-            .map { appInfo ->
-                ResultAdapter(
-                    appInfo.label,
-                    null,
-                    appInfo.icon,
-                    IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
-                    null
-                )
-            }
+            appList
+                .filter { app ->
+                    val customKeyword = customKeywords[app.packageName]
+                    val appLabel = app.label.lowercase()
+
+                    // Prioritize custom keywords, then check various matching criteria
+                    (customKeyword != null && customKeyword.startsWith(normalizedQuery)) ||
+                            appLabel.startsWith(normalizedQuery) ||
+                            appLabel.split(" ").any { it.startsWith(normalizedQuery) } ||
+                            StringUtils.fuzzyContains(normalizedQuery, app.label)
+                }
+                .distinctBy { it.packageName }
+                .map { appInfo ->
+                    ResultAdapter(
+                        appInfo.label,
+                        null,
+                        appInfo.icon,
+                        IntentUtils.getAppIntent(mPackageManager, appInfo.packageName),
+                        null
+                    )
+                }
         }
     }
 }

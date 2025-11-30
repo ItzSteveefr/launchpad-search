@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.R
 import com.devrinth.launchpad.plugins.PluginManager
@@ -36,7 +37,12 @@ class PluginListAdapter(
         holder.pluginDescription.text = plugin.description
         holder.pluginSwitch.isChecked = plugin.isEnabled
 
-        holder.pluginIcon.setImageDrawable(AppCompatResources.getDrawable(holder.itemView.context, plugin.iconResource ?: R.drawable.baseline_extension_24))
+        holder.pluginIcon.setImageDrawable(
+            AppCompatResources.getDrawable(
+                holder.itemView.context,
+                plugin.iconResource ?: R.drawable.baseline_extension_24
+            )
+        )
 
         holder.pluginSwitch.setOnCheckedChangeListener { _, isChecked ->
             pluginManager.setPluginEnabled(plugin.id, isChecked)
@@ -51,7 +57,24 @@ class PluginListAdapter(
     override fun getItemCount(): Int = plugins.size
 
     fun updatePlugins(newPlugins: List<PluginAdapter>) {
+        val diffCallback = PluginDiffCallback(plugins, newPlugins)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         plugins = newPlugins
-        notifyDataSetChanged()
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    class PluginDiffCallback(
+        private val oldList: List<PluginAdapter>,
+        private val newList: List<PluginAdapter>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize(): Int = oldList.size
+        override fun getNewListSize(): Int = newList.size
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].id == newList[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
     }
 }

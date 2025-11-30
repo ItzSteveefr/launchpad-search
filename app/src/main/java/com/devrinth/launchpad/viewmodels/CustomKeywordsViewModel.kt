@@ -15,12 +15,15 @@ import kotlinx.coroutines.withContext
 
 class CustomKeywordsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _apps = MutableLiveData<List<AppKeyword>>()
+    private val _apps = MutableLiveData<List<AppKeyword>>(emptyList())
     val apps: LiveData<List<AppKeyword>> = _apps
 
-    private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
+    private val sharedPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(application)
+    private var isLoaded = false
 
     fun loadApps() {
+        if (isLoaded) return
         viewModelScope.launch(Dispatchers.IO) {
             val pm = getApplication<Application>().packageManager
             val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
@@ -38,19 +41,14 @@ class CustomKeywordsViewModel(application: Application) : AndroidViewModel(appli
 
             withContext(Dispatchers.Main) {
                 _apps.value = appKeywords
+                isLoaded = true
             }
         }
     }
 
     fun saveKeyword(packageName: String, keyword: String) {
         sharedPreferences.edit().putString(packageName, keyword).apply()
-        // Update the LiveData to reflect the change
-        _apps.value = _apps.value?.map {
-            if (it.packageName == packageName) {
-                it.copy(keyword = keyword)
-            } else {
-                it
-            }
-        }
+        _apps.value?.find { it.packageName == packageName }?.keyword = keyword
+        _apps.value = _apps.value
     }
 }

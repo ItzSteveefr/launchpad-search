@@ -32,8 +32,8 @@ class PluginManagerPreferences : PreferenceFragmentCompat() {
                 setOnSettingsClickListener { pluginId ->
                     navigateToPluginSettings(pluginId)
                 }
-                setOnPreferenceChangeListener { _, _ ->
-                    // TODO: PLUGIN STATE CHANGE HANDLING
+                setOnPreferenceChangeListener { _, newValue ->
+                    pluginManager.setPluginEnabled(plugin.id, newValue as Boolean)
                     true
                 }
             }

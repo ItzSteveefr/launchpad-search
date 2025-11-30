@@ -1,7 +1,6 @@
 package com.devrinth.launchpad.activities
 
 import android.Manifest
-
 import android.app.StatusBarManager
 import android.content.ComponentName
 import android.content.Intent
@@ -12,6 +11,7 @@ import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
+import android.view.WindowInsetsController
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,9 +28,9 @@ import java.util.concurrent.Executors
 
 class SettingsActivity : AppCompatActivity() {
 
-    private lateinit var settingsContainer : View
-    private lateinit var pluginManagerContainer : View
-    private lateinit var homeContainer : View
+    private lateinit var settingsContainer: View
+    private lateinit var pluginManagerContainer: View
+    private lateinit var homeContainer: View
     private lateinit var navigationBarView: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,21 +38,23 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.settings_layout)
 
         val window = this.window
+        window.statusBarColor = SurfaceColors.SURFACE_2.getColor(this)
+        window.navigationBarColor = SurfaceColors.SURFACE_2.getColor(this)
 
-        val isDarkTheme = (resources.configuration.uiMode and
-                android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-                android.content.res.Configuration.UI_MODE_NIGHT_YES
-
-        val statusBarColor = ContextCompat.getColor(this, R.color.launchpad_background)
-        val navBarColor = ContextCompat.getColor(this, R.color.primary_dark)
-
-        window.statusBarColor = statusBarColor
-        window.navigationBarColor = navBarColor
-        if (isDarkTheme) {
-            window.decorView.systemUiVisibility = 0 // dark icons off
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.insetsController?.setSystemBarsAppearance(
+                0,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+            window.insetsController?.setSystemBarsAppearance(
+                0,
+                WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS
+            )
         } else {
+            @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
+
 
         // Initialize the new preference-based plugin management
         supportFragmentManager.beginTransaction()
@@ -74,30 +76,29 @@ class SettingsActivity : AppCompatActivity() {
             val permissions = arrayOf(Manifest.permission.READ_CONTACTS)
             requestPermissions(permissions, REQUEST_CODE_CONTACTS)
         } else {
-            Toast.makeText(baseContext, baseContext.resources.getString(R.string.home_contacts_toast), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                baseContext,
+                baseContext.resources.getString(R.string.home_contacts_toast),
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
     }
 
-    private fun checkContactsPermission() : Boolean {
+    private fun checkContactsPermission(): Boolean {
         return (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
                 == PackageManager.PERMISSION_GRANTED)
     }
 
     private fun checkCurrentAssistant(): Int {
-        return try {
-            Settings.Secure.getString(baseContext.contentResolver, "assistant")
-                .let { assistantIdentifier ->
-                    if (assistantIdentifier.isNotEmpty() && (ComponentName.unflattenFromString(assistantIdentifier)?.packageName == BuildConfig.APPLICATION_ID)) {
-                        0
-                    } else {
-                        1
-                    }
-                }
-        } catch (_: Exception) {
-            2
+        val assistant = Settings.Secure.getString(baseContext.contentResolver, "assistant")
+        return when {
+            assistant.isNullOrEmpty() -> 2 // Unknown
+            ComponentName.unflattenFromString(assistant)?.packageName == BuildConfig.APPLICATION_ID -> 0 // Is default
+            else -> 1 // Not default
         }
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -110,33 +111,32 @@ class SettingsActivity : AppCompatActivity() {
             findViewById<View>(R.id.home_contacts_summary).visibility = View.GONE
         }
 
-        when(checkCurrentAssistant()) {
-
+        when (checkCurrentAssistant()) {
             0 -> {
-                findViewById<TextView>(R.id.home_change_assist_title).text = baseContext.resources.getString(R.string.home_action_assist_ENABLED)
-                findViewById<TextView>(R.id.home_change_assist_summary).text = baseContext.resources.getString(R.string.home_assist_summary_ENABLED)
+                findViewById<TextView>(R.id.home_change_assist_title).text =
+                    baseContext.resources.getString(R.string.home_action_assist_ENABLED)
+                findViewById<TextView>(R.id.home_change_assist_summary).text =
+                    baseContext.resources.getString(R.string.home_assist_summary_ENABLED)
                 findViewById<View>(R.id.home_navigation_instructions).visibility = View.VISIBLE
             }
 
             1 -> {
-                findViewById<TextView>(R.id.home_change_assist_title).text = baseContext.resources.getString(R.string.home_action_assist)
-                findViewById<TextView>(R.id.home_change_assist_summary).text = baseContext.resources.getString(R.string.home_assist_summary)
+                findViewById<TextView>(R.id.home_change_assist_title).text =
+                    baseContext.resources.getString(R.string.home_action_assist)
+                findViewById<TextView>(R.id.home_change_assist_summary).text =
+                    baseContext.resources.getString(R.string.home_assist_summary)
                 findViewById<View>(R.id.home_navigation_instructions).visibility = View.GONE
             }
 
             2 -> {
                 findViewById<View>(R.id.home_navigation_instructions).visibility = View.VISIBLE
-                // lazy hack but saves time
                 val displayText = """
-                    |${resources.getString(R.string.home_assist_summary)}
-                    |
-                    |${resources.getString(R.string.home_assist_summary_ENABLED)}
-                """.trimIndent()
+      |${resources.getString(R.string.home_assist_summary)}
+      |
+      |${resources.getString(R.string.home_assist_summary_ENABLED)}
+    """.trimMargin()
                 findViewById<TextView>(R.id.home_change_assist_summary).text = displayText
-
-
             }
-
         }
     }
 
@@ -152,14 +152,14 @@ class SettingsActivity : AppCompatActivity() {
             checkAndRequestContactsPermission()
         }
         findViewById<View>(R.id.home_change_assist).setOnClickListener {
-            startActivity( Intent( Settings.ACTION_VOICE_INPUT_SETTINGS ) )
+            startActivity(Intent(Settings.ACTION_VOICE_INPUT_SETTINGS))
         }
 
         findViewById<View>(R.id.home_button_qs_tile).setOnClickListener {
             if (Build.VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
                 val componentName = ComponentName(this, LaunchpadTileService::class.java)
 
-                val mStatusBarManager : StatusBarManager = getSystemService(StatusBarManager::class.java)
+                val mStatusBarManager: StatusBarManager = getSystemService(StatusBarManager::class.java)
 
                 mStatusBarManager.requestAddTileService(
                     componentName,
@@ -167,18 +167,23 @@ class SettingsActivity : AppCompatActivity() {
                     Icon.createWithResource(this, R.drawable.shortcut_icon),
                     Executors.newSingleThreadExecutor()
                 ) {
-                    when (it) {
-                        StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED -> {
-                            settingsContainer.post {
-                                Toast.makeText(this,
-                                    getString(R.string.general_warning_qs_tile_exists), Toast.LENGTH_SHORT).show()
-                            }
+                    if (it == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED) {
+                        settingsContainer.post {
+                            Toast.makeText(
+                                this,
+                                getString(R.string.general_warning_qs_tile_exists),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
 
             } else {
-                Toast.makeText(this, getString(R.string.general_warning_qs_tile), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.general_warning_qs_tile),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
         val navigationMap = mapOf(
@@ -186,7 +191,7 @@ class SettingsActivity : AppCompatActivity() {
             R.id.navigation_home to homeContainer,
             R.id.navigation_plugins to pluginManagerContainer
         )
-        navigationBarView.setOnItemSelectedListener {item ->
+        navigationBarView.setOnItemSelectedListener { item ->
             navigationMap.forEach { (t, u) ->
                 if (t == item.itemId) {
                     u.visibility = View.VISIBLE

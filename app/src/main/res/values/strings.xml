@@ -9,9 +9,6 @@
     <string name="shortcut_assistant_label">Assist Settings</string>
     <string name="shortcut_assistant_long_label">Set as Assistant </string>
 
-    <string name="shortcut_settings_label">Settings</string>
-    <string name="shortcut_settings_long_label">Open app settings</string>
-
     <string name="menu_home">Home</string>
     <string name="menu_plugins">Plugins</string>
     <string name="menu_settings">Settings</string>
@@ -86,17 +83,17 @@
 
     <string name="general_warning_assistant_service">Launchpad is already running</string>
 
-    <string name="plugin_search_result">Search %s for %s</string>
+    <string name="plugin_search_result">Search %1$s for %2$s</string>
 
-    <string name="plugin_unit_conversion_result">%.3f %s</string>
-    <string name="plugin_unit_conversion_result_full">%f %s</string>
-    <string name="plugin_unit_conversion_result_units">%s to %s</string>
+    <string name="plugin_unit_conversion_result">%.3f %1$s</string>
+    <string name="plugin_unit_conversion_result_full">%1$f %2$s</string>
+    <string name="plugin_unit_conversion_result_units">%1$s to %2$s</string>
 
-    <string name="plugin_definition_result_title">Word alternative for %s</string>
+    <string name="plugin_definition_result_title">Word alternative for %1$s</string>
     <string name="plugin_definition_result">
-        Synonyms : %s
+        Synonyms : %1$s
 
-        Antonyms : %s
+        Antonyms : %2$s
     </string>
 
 

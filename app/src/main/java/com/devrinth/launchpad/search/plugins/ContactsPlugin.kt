@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.ContactsContract
 import android.util.LruCache
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.devrinth.launchpad.adapters.ResultAdapter
@@ -23,11 +22,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.absoluteValue
+
 class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
     override var ID = "contacts"
 
-    private lateinit var mContentResolver : ContentResolver
+    private lateinit var mContentResolver: ContentResolver
 
     private val nameProjection = arrayOf(
         ContactsContract.Contacts._ID,
@@ -37,8 +37,6 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
     private var searchNumber: Boolean = true
     private var searchEmail: Boolean = true
-
-    private var isProcessing = false
 
     // Cache for loaded contacts
     private var cachedContacts = mutableMapOf<String, ContactData>()
@@ -71,9 +69,11 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
     )
 
     override fun pluginInit() {
-        val perms = ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
+        val perms = ContextCompat.checkSelfPermission(
+            mContext,
+            Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
         if (!perms) {
-            Toast.makeText(mContext, "Contacts permission needed", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -86,15 +86,13 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
     }
 
     override fun pluginProcess(query: String) {
-        if (!INIT || query.isEmpty() || query.length < 2 || isProcessing) {
+        if (!INIT || query.length < 2) {
             pluginResult(emptyList(), "")
             return
         }
-        isProcessing = false
 
         CoroutineScope(Dispatchers.Main).launch {
             pluginResult(filterContacts(query), query)
-            isProcessing = false
         }
     }
 
@@ -108,13 +106,16 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             null
         )
 
-        try {
-            if (allContactsCursor != null) {
-                while (allContactsCursor.moveToNext()) {
-                    val contactId = allContactsCursor.getString(allContactsCursor.getColumnIndex(ContactsContract.Contacts._ID))
-                    val displayName = allContactsCursor.getString(allContactsCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY))
-                    val photoUri = allContactsCursor.getString(allContactsCursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI))
+        allContactsCursor?.use { cursor ->
+            while (cursor.moveToNext()) {
+                val contactId =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
+                val displayName =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY))
+                val photoUri =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI))
 
+                if (contactId != null) {
                     cachedContacts[contactId] = ContactData(
                         id = contactId,
                         displayName = displayName ?: "",
@@ -123,11 +124,9 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
                         emailAddresses = mutableListOf()
                     )
                 }
-                allContactsCursor.close()
             }
-        } catch (e: Exception) {
-            allContactsCursor?.close()
         }
+
 
         if (searchNumber) {
             val phoneCursor = mContentResolver.query(
@@ -140,18 +139,17 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
                 null,
                 null
             )
-            try {
-                if (phoneCursor != null) {
-                    while (phoneCursor.moveToNext()) {
-                        val contactId = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID))
-                        val phoneNumber = phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+            phoneCursor?.use { cursor ->
+                while (cursor.moveToNext()) {
+                    val contactId =
+                        cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID))
+                    val phoneNumber =
+                        cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
 
+                    if (contactId != null) {
                         cachedContacts[contactId]?.phoneNumbers?.add(phoneNumber ?: "")
                     }
-                    phoneCursor.close()
                 }
-            } catch (e: Exception) {
-                phoneCursor?.close()
             }
         }
 
@@ -166,19 +164,17 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
                 null,
                 null
             )
+            emailCursor?.use { cursor ->
+                while (cursor.moveToNext()) {
+                    val contactId =
+                        cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.CONTACT_ID))
+                    val emailAddress =
+                        cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS))
 
-            try {
-                if (emailCursor != null) {
-                    while (emailCursor.moveToNext()) {
-                        val contactId = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.CONTACT_ID))
-                        val emailAddress = emailCursor.getString(emailCursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS))
-
+                    if (contactId != null) {
                         cachedContacts[contactId]?.emailAddresses?.add(emailAddress ?: "")
                     }
-                    emailCursor.close()
                 }
-            } catch (e: Exception) {
-                emailCursor?.close()
             }
         }
     }
@@ -187,59 +183,52 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
     private suspend fun filterContacts(query: String): List<ResultAdapter> {
         return withContext(Dispatchers.Default) {
             val queryLower = query.lowercase().trim()
-            val allContacts = cachedContacts
 
-            val scoredContacts = cachedContacts.values
+            cachedContacts.values
+                .asSequence()
                 .filter { it.phoneNumbers.isNotEmpty() } //Only contacts with phone numbers
                 .mapNotNull { contact ->
-                val score = calculateFuzzyScore(queryLower, contact)
-                if (score > 0.3) {
-                    ScoredContact(contact, score)
-                } else null
-            }.sortedByDescending { it.score }
-
-            val filteredContacts = scoredContacts.map { scoredContact ->
-                val contact = scoredContact.contact
-
-                val contactPhoto: Drawable = try {
-                    contact.photoUri?.let {
-                        getContactPhotoDrawable(it.toUri()) ?: createTextAvatar(contact.id, contact.displayName)
-                    } ?: createTextAvatar(contact.id, contact.displayName)
-                } catch (e: Exception) {
-                    createTextAvatar(contact.id, contact.displayName)
+                    val score = calculateFuzzyScore(queryLower, contact)
+                    if (score > 0.3) ScoredContact(contact, score) else null
                 }
+                .sortedByDescending { it.score }
+                .map { scoredContact ->
+                    val contact = scoredContact.contact
 
-                val phoneNumber = contact.phoneNumbers.firstOrNull()?.trim()
-                val emailAddress = contact.emailAddresses.firstOrNull()?.trim()
+                    val contactPhoto: Drawable =
+                        contact.photoUri?.let { getContactPhotoDrawable(it.toUri()) }
+                            ?: createTextAvatar(contact.id, contact.displayName)
 
-                val contactInfo = when {
-                    phoneNumber != null && emailAddress != null -> "$phoneNumber • $emailAddress"
-                    phoneNumber != null -> phoneNumber
-                    emailAddress != null -> emailAddress
-                    else -> ""
+                    val phoneNumber = contact.phoneNumbers.firstOrNull()?.trim()
+                    val emailAddress = contact.emailAddresses.firstOrNull()?.trim()
+
+                    val contactInfo = when {
+                        phoneNumber != null && emailAddress != null -> "$phoneNumber • $emailAddress"
+                        phoneNumber != null -> phoneNumber
+                        emailAddress != null -> emailAddress
+                        else -> ""
+                    }
+
+                    val callIntent = if (!phoneNumber.isNullOrEmpty()) {
+                        IntentUtils.getCallIntent(phoneNumber)
+                    } else null
+
+                    val emailIntent = if (!emailAddress.isNullOrEmpty()) {
+                        IntentUtils.getEmailIntent(emailAddress)
+                    } else null
+
+                    val primaryIntent = callIntent ?: emailIntent
+                    val secondaryIntent = if (callIntent != null && emailIntent != null) emailIntent else null
+
+                    ResultAdapter(
+                        contact.displayName,
+                        contactInfo,
+                        contactPhoto,
+                        primaryIntent,
+                        secondaryIntent
+                    )
                 }
-
-                val callIntent = if (!phoneNumber.isNullOrEmpty()) {
-                    IntentUtils.getCallIntent(phoneNumber)
-                } else null
-
-                val emailIntent = if (!emailAddress.isNullOrEmpty()) {
-                    IntentUtils.getEmailIntent(emailAddress)
-                } else null
-
-                val primaryIntent = callIntent ?: emailIntent
-                val secondaryIntent = if (callIntent != null && emailIntent != null) emailIntent else null
-
-                ResultAdapter(
-                    contact.displayName,
-                    contactInfo,
-                    contactPhoto,
-                    primaryIntent,
-                    secondaryIntent
-                )
-            }
-
-            filteredContacts
+                .toList()
         }
     }
 
@@ -252,7 +241,6 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             val inputStream = contentResolver.openInputStream(photoUri)
             Drawable.createFromStream(inputStream, photoUri.toString())
         } catch (e: Exception) {
-            e.printStackTrace()
             null
         }
     }
@@ -265,8 +253,7 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             .split(" ")
             .filter { it.isNotEmpty() }
             .take(2)
-            .map { it.first().uppercaseChar() }
-            .joinToString("")
+            .joinToString("") { it.first().uppercase() }
 
         val size = 128
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
@@ -293,8 +280,7 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
     }
 
     private fun calculateFuzzyScore(query: String, contact: ContactData): Double {
-        var maxScore = 0.0
-        maxScore = maxOf(maxScore, fuzzyMatch(query, contact.displayName.lowercase()))
+        var maxScore = fuzzyMatch(query, contact.displayName.lowercase())
 
         if (searchNumber) {
             contact.phoneNumbers.forEach { phone ->
@@ -328,10 +314,10 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
         /*
             Lazy processing beforehand to process simple strings
         */
-        if (target.contains(query)) {
+        if (target.contains(query, ignoreCase = true)) {
             return when {
-                target == query -> 1.0
-                target.startsWith(query) -> 0.9
+                target.equals(query, ignoreCase = true) -> 1.0
+                target.startsWith(query, ignoreCase = true) -> 0.9
                 else -> 0.8
             }
         }
@@ -344,20 +330,14 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             If there are multiple words, we check if any of the target words start with or contain the query words.
         */
         if (queryWords.size > 1 || targetWords.size > 1) {
-            var wordMatches = 0
-            val totalWords = queryWords.size
-
-            queryWords.forEach { queryWord ->
-                for (targetWord in targetWords) {
-                    if (targetWord.startsWith(queryWord) || targetWord.contains(queryWord)) {
-                        wordMatches++
-                        break
-                    }
+            val wordMatches = queryWords.count { queryWord ->
+                targetWords.any { targetWord ->
+                    targetWord.startsWith(queryWord, ignoreCase = true)
                 }
             }
 
             if (wordMatches > 0) {
-                return (wordMatches.toDouble() / totalWords) * 0.7
+                return (wordMatches.toDouble() / queryWords.size) * 0.7
             }
         }
 
