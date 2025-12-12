@@ -55,6 +55,12 @@ class PluginManager(context: Context) {
             title = "Shortcuts",
             description = "Access app shortcuts and actions",
             iconResource = R.drawable.baseline_settings_24
+        ),
+        PluginAdapter(
+            id = "clipboard",
+            title = "Clipboard History",
+            description = "Access your copied text history",
+            iconResource = R.drawable.ic_clipboard_24
         )
     )
 
@@ -72,7 +78,7 @@ class PluginManager(context: Context) {
     fun hasSettings(pluginId: String): Boolean {
         // Check if plugin has dedicated settings screen
         return when (pluginId) {
-            "calculator", "units", "apps", "contacts", "settings", "search_suggestions" -> true
+            "calculator", "units", "apps", "contacts", "settings", "search_suggestions", "clipboard" -> true
             else -> false
         }
     }

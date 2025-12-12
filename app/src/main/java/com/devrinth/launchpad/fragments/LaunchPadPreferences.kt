@@ -35,7 +35,9 @@ class LaunchPadPreferences : PreferenceFragmentCompat() {
         findPreference<androidx.preference.Preference>("setting_about_mail")?.apply {
             summary = "support@devrinth.com"
             setOnPreferenceClickListener {
-                // Handle email click
+                try {
+                    startActivity(com.devrinth.launchpad.utils.IntentUtils.getEmailIntent("support@devrinth.com"))
+                } catch (e: Exception) { e.printStackTrace() }
                 true
             }
         }
@@ -43,21 +45,27 @@ class LaunchPadPreferences : PreferenceFragmentCompat() {
         findPreference<androidx.preference.Preference>("setting_about_website")?.apply {
             summary = "https://devrinth.com"
             setOnPreferenceClickListener {
-                // Handle website click
+                try {
+                    startActivity(com.devrinth.launchpad.utils.IntentUtils.getLinkIntent("https://devrinth.com"))
+                } catch (e: Exception) { e.printStackTrace() }
                 true
             }
         }
 
         findPreference<androidx.preference.Preference>("setting_about_privacy")?.apply {
             setOnPreferenceClickListener {
-                // Handle privacy policy click
+                try {
+                    startActivity(com.devrinth.launchpad.utils.IntentUtils.getLinkIntent("https://devrinth.com/legal/privacy"))
+                } catch (e: Exception) { e.printStackTrace() }
                 true
             }
         }
 
         findPreference<androidx.preference.Preference>("setting_about_bmc")?.apply {
             setOnPreferenceClickListener {
-                // Handle buy me a coffee click
+                try {
+                    startActivity(com.devrinth.launchpad.utils.IntentUtils.getLinkIntent("https://ko-fi.com/devrinth"))
+                } catch (e: Exception) { e.printStackTrace() }
                 true
             }
         }

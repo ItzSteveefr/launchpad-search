@@ -30,11 +30,21 @@ class SearchSuggestionsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
         // This reads the plugin settings from the "websearch" plugin
         val PARENT_PLUGIN_ID = "websearch"
-        val search = (mPluginManager.getPluginSetting(PARENT_PLUGIN_ID,"engine", mContext.resources.getString(R.string.search_google_query) ) as String).toString().split("|")[0]
+        val engineParts = try {
+            (mPluginManager.getPluginSetting(PARENT_PLUGIN_ID, "engine", 
+                mContext.resources.getString(R.string.search_google_query)) as String).split("|")
+        } catch (e: Exception) {
+            listOf("google", mContext.resources.getString(R.string.search_google_query))
+        }
+        val search = engineParts.getOrNull(0) ?: ""
         searchEngineQ = if (search != "custom") {
-            ( mPluginManager.getPluginSetting(PARENT_PLUGIN_ID,"engine", mContext.resources.getString(R.string.search_google_query)) as String ).split("|")[1]
+            engineParts.getOrNull(1) ?: mContext.resources.getString(R.string.search_google_query)
         } else {
-            ( mPluginManager.getPluginSetting(PARENT_PLUGIN_ID,"custom_engine", mContext.resources.getString(R.string.search_google_query)) as String ).split("|")[1]
+             try {
+                ( mPluginManager.getPluginSetting(PARENT_PLUGIN_ID,"custom_engine", mContext.resources.getString(R.string.search_google_query)) as String ).split("|")[1]
+            } catch (e: Exception) {
+                mContext.resources.getString(R.string.search_google_query)
+            }
         }
 
     }
@@ -72,7 +82,7 @@ class SearchSuggestionsPlugin(mContext: Context) : SearchPlugin(mContext) {
                             suggestion,
                             null,
                             null,
-                            IntentUtils.getLinkIntent( searchEngineQ.format( StringUtils.encodeUrl(query) ) ),
+                            IntentUtils.getLinkIntent( searchEngineQ.format( StringUtils.encodeUrl(suggestion) ) ),
                             null
                         )
                     )

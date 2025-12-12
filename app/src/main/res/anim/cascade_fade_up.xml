@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cascade fade-up animation for list items -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="true"
+    android:interpolator="@android:anim/overshoot_interpolator">
+
+    <!-- Fade in -->
+    <alpha
+        android:duration="250"
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0" />
+
+    <!-- Slide up from below -->
+    <translate
+        android:duration="300"
+        android:fromYDelta="15%"
+        android:toYDelta="0" />
+</set>

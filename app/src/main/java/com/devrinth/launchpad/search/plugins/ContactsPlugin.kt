@@ -90,7 +90,7 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
             pluginResult(emptyList(), "")
             return
         }
-        isProcessing = false
+        isProcessing = true
 
         CoroutineScope(Dispatchers.Main).launch {
             pluginResult(filterContacts(query), query)
@@ -100,6 +100,8 @@ class ContactsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
     @SuppressLint("Range")
     private fun loadContacts() {
+        if (!::mContentResolver.isInitialized) return
+
         val allContactsCursor = mContentResolver.query(
             ContactsContract.Contacts.CONTENT_URI,
             nameProjection,

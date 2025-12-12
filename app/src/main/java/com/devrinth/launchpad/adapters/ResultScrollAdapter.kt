@@ -100,7 +100,8 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
             holder.parentView.setOnLongClickListener { false  }
         }
 
-        val animation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in)
+        // Apply premium cascade fade-up animation
+        val animation = AnimationUtils.loadAnimation(mContext, R.anim.cascade_fade_up)
         holder.itemView.startAnimation(animation)
     }
 
@@ -110,5 +111,14 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
         val resultIcon: ImageView = itemView.findViewById(R.id.result_icon)
 
         val parentView: View = itemView
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        try {
+            mContext.unregisterReceiver(reloadReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiver not registered
+        }
     }
 }

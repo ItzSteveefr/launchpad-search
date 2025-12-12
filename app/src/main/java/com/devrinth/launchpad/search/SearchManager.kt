@@ -20,9 +20,12 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.BuildConfig
+import com.devrinth.launchpad.Launchpad
 import com.devrinth.launchpad.adapters.ResultAdapter
 import com.devrinth.launchpad.adapters.ResultScrollAdapter
+import com.devrinth.launchpad.data.ClipboardEntity
 import com.devrinth.launchpad.search.external.ExternalSearch
+import com.devrinth.launchpad.utils.ClipboardHelper
 
 import com.devrinth.launchpad.search.plugins.*
 import kotlinx.coroutines.CoroutineScope
@@ -50,6 +53,7 @@ class SearchManager(
         "calculator" to CalculatorPlugin(mContext),
         "units" to UnitConversionPlugin(mContext),
         "shortcuts" to ShortcutsPlugin(mContext),
+        "clipboard" to ClipboardPlugin(mContext),
 
     )
 
@@ -101,6 +105,9 @@ class SearchManager(
 
         resultScrollAdapter = ResultScrollAdapter(resultArray, mContext)
         resultRecyclerView.adapter = resultScrollAdapter
+        
+        // Apply cascade animation for premium staggered effect
+        resultRecyclerView.itemAnimator = com.devrinth.launchpad.utils.AnimUtils.cascadeItemAnimator()
 
         if (!sharedPreferences.getBoolean("setting_clear_search", true)) {
             searchTextBox.setText(sharedPreferences.getString("LAST_SEARCH_QUERY", ""))
@@ -137,6 +144,41 @@ class SearchManager(
         pluginList.forEach {
             it.pluginResume()
         }
+        
+        // Check and save new clipboard content on resume
+        checkAndSaveClipboard()
+    }
+    
+    private fun checkAndSaveClipboard() {
+        val clipboardContent = ClipboardHelper.getCurrentClipboardContent(mContext) ?: return
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val app = mContext.applicationContext as Launchpad
+                val clipboardDao = app.database.clipboardDao()
+                
+                val contentHash = ClipboardHelper.computeContentHash(clipboardContent)
+                
+                // Only insert if this is new content
+                if (!clipboardDao.existsByHash(contentHash)) {
+                    val entity = ClipboardEntity(
+                        content = clipboardContent,
+                        contentHash = contentHash,
+                        timestamp = System.currentTimeMillis(),
+                        type = "text/plain",
+                        isPinned = false,
+                        preview = ClipboardHelper.truncateForPreview(clipboardContent)
+                    )
+                    clipboardDao.insert(entity)
+                    
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Saved new clipboard entry: ${entity.preview}")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to save clipboard: ${e.message}")
+            }
+        }
     }
 
     /*
@@ -148,7 +190,10 @@ class SearchManager(
     *  */
     private fun loadPlugin(pluginName: String, isInternalPlugin: Boolean = false) {
 
-        val plugin = pluginsMap[pluginName]!!
+        val plugin = pluginsMap[pluginName] ?: run {
+            Log.e(TAG, "Plugin $pluginName not found in pluginsMap")
+            return
+        }
 
         try {
             plugin.pluginInit()

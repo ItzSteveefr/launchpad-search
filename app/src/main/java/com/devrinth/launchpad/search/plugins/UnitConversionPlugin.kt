@@ -151,6 +151,7 @@ class UnitConversionPlugin(mContext: Context) : SearchPlugin(mContext) {
             )
 
         } catch (e: Exception) {
+            pluginResult(emptyList(), query)
         }
     }
 }

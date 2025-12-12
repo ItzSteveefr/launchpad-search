@@ -2,9 +2,14 @@ package com.devrinth.launchpad.fragments
 
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
+import com.devrinth.launchpad.Launchpad
 import com.devrinth.launchpad.R
 import androidx.core.content.edit
 import com.devrinth.launchpad.utils.StringUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PluginSettingsFragment : PreferenceFragmentCompat() {
 
@@ -32,7 +37,7 @@ class PluginSettingsFragment : PreferenceFragmentCompat() {
             "contacts" -> setupContactsSettings()
             "settings" -> setupSettingsPluginSettings()
             "shortcuts" -> setupShortcutsSettings()
-
+            "clipboard" -> setupClipboardSettings()
         }
     }
 
@@ -118,6 +123,33 @@ class PluginSettingsFragment : PreferenceFragmentCompat() {
 
     private fun setupShortcutsSettings() {
         // Setup shortcuts plugin preferences - no special handling needed
+    }
+
+    private fun setupClipboardSettings() {
+        findPreference<androidx.preference.Preference>("plugin_clipboard_clear_all")?.apply {
+            setOnPreferenceClickListener {
+                try {
+                    val app = requireContext().applicationContext as Launchpad
+                    CoroutineScope(Dispatchers.IO).launch {
+                        app.database.clipboardDao().deleteAll()
+                        withContext(Dispatchers.Main) {
+                            android.widget.Toast.makeText(
+                                requireContext(),
+                                "Clipboard history cleared",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(
+                        requireContext(),
+                        "Error clearing history: ${e.message}",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+                true
+            }
+        }
     }
 
     override fun onDestroyView() {

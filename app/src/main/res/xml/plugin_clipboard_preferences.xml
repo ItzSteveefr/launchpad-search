@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Clipboard History"
+        android:icon="@drawable/ic_clipboard_24">
+
+        <SwitchPreference
+            android:key="plugin_clipboard_enabled"
+            android:title="Enable Clipboard History"
+            android:summary="Save copied text to search history"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="plugin_clipboard_retention_days"
+            android:title="Retention Period"
+            android:summary="How long to keep clipboard entries"
+            android:entries="@array/clipboard_retention_entries"
+            android:entryValues="@array/clipboard_retention_values"
+            android:defaultValue="5"
+            android:dependency="plugin_clipboard_enabled" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Privacy">
+
+        <Preference
+            android:key="plugin_clipboard_clear_all"
+            android:title="Clear All History"
+            android:summary="Permanently delete all clipboard entries"
+            android:icon="@drawable/baseline_delete_24" />
+
+        <Preference
+            android:key="plugin_clipboard_privacy_info"
+            android:title="Privacy Notice"
+            android:summary="Passwords and sensitive content are automatically filtered. Clipboard is only checked when the search overlay opens."
+            android:selectable="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Activation">
+
+        <Preference
+            android:key="plugin_clipboard_activation_info"
+            android:title="How to use"
+            android:summary="Type 'clip' or 'copy' in search to see clipboard history. Recent copies also appear when search is empty."
+            android:selectable="false" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -54,6 +54,7 @@ class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
 
             legacyShortcuts.forEach { ri ->
                 if (ri.activityInfo.packageName != BuildConfig.APPLICATION_ID) {
+                try {
                     val label = ri.loadLabel(mPackageManager).toString()
                     val appLabel = mPackageManager.getApplicationLabel(
                         mPackageManager.getApplicationInfo(ri.activityInfo.packageName, 0)
@@ -70,6 +71,9 @@ class ShortcutsPlugin(mContext: Context) : SearchPlugin(mContext) {
                             )
                         )
                     }
+                } catch (e: PackageManager.NameNotFoundException) {
+                    // Skip if package not found
+                }
                 }
             }
             results

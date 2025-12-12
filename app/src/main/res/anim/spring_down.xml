@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Spring-down animation for search card exit -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+
+    <!-- Fade out -->
+    <alpha
+        android:duration="200"
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"
+        android:interpolator="@android:anim/accelerate_interpolator" />
+
+    <!-- Slide down -->
+    <translate
+        android:duration="250"
+        android:fromYDelta="0"
+        android:toYDelta="10%"
+        android:interpolator="@android:anim/accelerate_interpolator" />
+
+    <!-- Scale down slightly -->
+    <scale
+        android:duration="200"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:toXScale="0.97"
+        android:toYScale="0.97"
+        android:pivotX="50%"
+        android:pivotY="100%"
+        android:interpolator="@android:anim/accelerate_interpolator" />
+</set>

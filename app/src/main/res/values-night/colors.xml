@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Text Colors (Dark Mode) -->
     <color name="text_hint">#808080</color>
     <color name="text_primary">#E6E6E6</color>
     <color name="text_secondary">#B3B3B3</color>
+    <color name="on_surface_variant">#CAC4D0</color>
 
+    <!-- Legacy Backgrounds (kept for compatibility) -->
     <color name="primary_background">#0D0D0D</color>
     <color name="card_background_light">#1A1A1A</color>
     <color name="search_bar_background">#1A1A1A</color>
     <color name="primary_card_accent">#333333</color>
     <color name="launchpad_background">#0D0D0D</color>
     <color name="primary_dark">#000000</color>
+
+    <!-- Glass Effect Colors (High Alpha for Translucency - Dark) -->
+    <color name="glass_background">#DD0D0D0D</color>
+    <color name="glass_surface">#E6121212</color>
+    <color name="glass_card">#F21C1C1C</color>
+
+    <!-- Material 3 Tonal Surface Colors (Dark) -->
+    <color name="surface_container">#211F26</color>
+    <color name="surface_container_low">#1D1B20</color>
+    <color name="surface_container_high">#2B2930</color>
+    <color name="surface_container_highest">#36343B</color>
+
+    <!-- Overlay & Scrim -->
+    <color name="scrim_background">#66000000</color>
+
+    <!-- Ripple Colors -->
+    <color name="ripple_material_light">#33FFFFFF</color>
 </resources>

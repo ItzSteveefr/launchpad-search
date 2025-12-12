@@ -75,8 +75,10 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
                     }
                 }
             }
+            withContext(Dispatchers.Main) {
+                loadCustomKeywords()
+            }
         }
-        loadCustomKeywords()
         super.pluginInit()
     }
 

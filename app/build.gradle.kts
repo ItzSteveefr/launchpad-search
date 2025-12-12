@@ -56,6 +56,9 @@ dependencies {
 
     implementation("androidx.room:room-ktx:2.7.1")
 
+    // WorkManager for periodic clipboard cleanup
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.notkamui.libs:keval:1.0.1")
@@ -69,6 +72,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation ("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.dynamicanimation:dynamicanimation:1.0.0")
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-core:5.2.0")

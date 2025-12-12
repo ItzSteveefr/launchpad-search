@@ -1,142 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- For dynamic spacing for tablets, this nested weighting is required -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:fitsSystemWindows="true"
+<!-- Material 3 Search Layout (Reverse/Bottom) with CoordinatorLayout and MaterialCardView -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/launchpad_root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:gravity="center_horizontal">
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/launchpad_main_layout"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="bottom">
 
-        <androidx.cardview.widget.CardView
-            app:cardCornerRadius="20dp"
+        <!-- Main Search Card - Glass Effect (Bottom-aligned) -->
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/search_card_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardBackgroundColor="@color/glass_card"
+            app:cardElevation="8dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
-                android:fitsSystemWindows="true"
                 android:id="@+id/search_card_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingHorizontal="@dimen/large_spacing"
-                >
+                android:fitsSystemWindows="true">
 
+                <!-- Results RecyclerView (above search bar in reverse layout) -->
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/results_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/search_result_holder_height"
                     android:paddingTop="@dimen/result_item_alternate_margin_top"
                     android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    app:reverseLayout="true"
-                    android:layout_height="@dimen/search_result_holder_height"
-                    android:id="@+id/results_view">
+                    android:clipToPadding="false"
+                    android:requiresFadingEdge="vertical"
+                    android:fadingEdgeLength="16dp"
+                    android:overScrollMode="never"
+                    app:reverseLayout="true" />
 
-                </androidx.recyclerview.widget.RecyclerView>
-
-                <androidx.cardview.widget.CardView
-                    android:fitsSystemWindows="true"
+                <!-- Search Bar - Floating Pill Shape -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/search_bar_card"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/search_bar_height"
-                    style="@style/Theme.Launchpad.SearchBar">
+                    android:layout_margin="@dimen/large_spacing"
+                    app:cardCornerRadius="50dp"
+                    app:cardBackgroundColor="@color/glass_surface"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    android:stateListAnimator="@animator/search_bar_elevation"
+                    android:fitsSystemWindows="true">
 
                     <EditText
+                        android:id="@+id/search_input"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:paddingHorizontal="@dimen/search_bar_input_padding"
                         android:layout_gravity="center"
-
-                        android:drawableLeft="@drawable/baseline_search_24"
+                        android:drawableStart="@drawable/baseline_search_24"
+                        android:drawablePadding="12dp"
                         android:background="@android:color/transparent"
                         android:hint="@string/search_bar_input_text"
-
-
                         android:singleLine="true"
-                        android:textAlignment="center"
+                        android:textAlignment="viewStart"
                         android:textColorHint="@color/text_hint"
                         android:textColor="@color/text_primary"
-
+                        android:textSize="16sp"
                         android:inputType="text"
-
                         android:focusable="true"
                         android:focusableInTouchMode="true"
+                        android:imeOptions="actionSearch" />
 
-                        android:id="@+id/search_input"
-                        android:imeOptions="actionSearch"
-                        >
+                </com.google.android.material.card.MaterialCardView>
 
-                    </EditText>
-
-                </androidx.cardview.widget.CardView>
-
+                <!-- Action Buttons Row -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingBottom="@dimen/large_spacing">
 
                     <ImageButton
-                        android:layout_width="@dimen/search_action_button_geometry"
-                        android:layout_height="@dimen/search_action_button_geometry"
-                        android:layout_margin="@dimen/default_spacing"
                         android:id="@+id/action_settings"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/baseline_settings_24"
-                        android:contentDescription="@string/search_action_settings"
-                        />
-
-                    <ImageButton
                         android:layout_width="@dimen/search_action_button_geometry"
                         android:layout_height="@dimen/search_action_button_geometry"
                         android:layout_margin="@dimen/default_spacing"
-                        android:id="@+id/action_close"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/baseline_close_24"
-                        android:contentDescription="@string/search_action_close"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/baseline_settings_24"
+                        android:contentDescription="@string/search_action_settings" />
 
-                        />
+                    <ImageButton
+                        android:id="@+id/action_close"
+                        android:layout_width="@dimen/search_action_button_geometry"
+                        android:layout_height="@dimen/search_action_button_geometry"
+                        android:layout_margin="@dimen/default_spacing"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:src="@drawable/baseline_close_24"
+                        android:contentDescription="@string/search_action_close" />
+
                 </LinearLayout>
 
             </LinearLayout>
 
-
-        </androidx.cardview.widget.CardView>
-
-
-<!--        <androidx.cardview.widget.CardView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_below="@id/search_card_view"-->
-<!--            style="@style/Theme.Launchpad.Bottom"-->
-<!--            >-->
-
-<!--            <LinearLayout-->
-<!--                android:layout_margin="@dimen/large_spacing"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:gravity="center">-->
-
-<!--                <androidx.recyclerview.widget.RecyclerView-->
-<!--                    android:orientation="horizontal"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="@dimen/pinned_holder_height"-->
-<!--                    android:id="@+id/pinned_apps_view">-->
-
-<!--                </androidx.recyclerview.widget.RecyclerView>-->
-
-<!--            </LinearLayout>-->
-
-<!--        </androidx.cardview.widget.CardView>-->
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

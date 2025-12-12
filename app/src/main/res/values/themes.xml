@@ -1,14 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.Transparent" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!-- Base application theme - Transparent for overlay -->
+    <style name="Theme.Transparent" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <!-- Main Application Theme -->
     <style name="Theme.Launchpad" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/primary_background</item>
-        <item name="android:navigationBarColor">@color/card_background_light</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/surface_container</item>
         <item name="preferenceTheme">@style/ThemeOverlay.App.Preference</item>
+        <!-- Dynamic color support -->
+        <item name="colorPrimary">?attr/colorPrimaryDynamic</item>
+        <item name="colorSurface">@color/surface_container_low</item>
     </style>
 
     <style name="ThemeOverlay.App.Preference" parent="PreferenceThemeOverlay">
@@ -19,13 +23,14 @@
         <item name="android:widgetLayout">@layout/view_preference_switch</item>
     </style>
 
+    <!-- Search Overlay Theme - Ethereal Glass Effect -->
     <style name="Theme.Launchpad.Search" parent="Theme.Launchpad">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:minWidth">@dimen/parent_layout_max</item>
         <item name="android:layout_margin">@dimen/extra_spacing</item>
         <item name="cardCornerRadius">@dimen/search_layout_radius</item>
-        <item name="cardBackgroundColor">@color/primary_background</item>
-        <item name="cardElevation">2dp</item>
+        <item name="cardBackgroundColor">@color/glass_card</item>
+        <item name="cardElevation">8dp</item>
     </style>
 
     <style name="Theme.Launchpad.Bottom" parent="Theme.Launchpad.Search">
@@ -34,53 +39,73 @@
     <style name="Theme.Launchpad.Search.Button" parent="Theme.Launchpad.Search">
     </style>
 
+    <!-- Search Bar - Floating Pill with Elevation Animation -->
     <style name="Theme.Launchpad.SearchBar">
         <item name="android:layout_margin">@dimen/large_spacing</item>
-        <item name="cardCornerRadius">@dimen/search_layout_radius</item>
-        <item name="cardBackgroundColor">@color/search_bar_background</item>
-        <item name="cardElevation">1dp</item>
+        <item name="cardCornerRadius">50dp</item>
+        <item name="cardBackgroundColor">@color/glass_surface</item>
+        <item name="cardElevation">2dp</item>
+        <item name="strokeWidth">0dp</item>
     </style>
 
+    <!-- Search Bar - Focused State (Higher Elevation) -->
+    <style name="Theme.Launchpad.SearchBar.Focused" parent="Theme.Launchpad.SearchBar">
+        <item name="cardElevation">6dp</item>
+    </style>
+
+    <!-- Search Suggestion Chip Style -->
     <style name="Theme.Launchpad.SearchSuggestion">
-        <item name="cardBackgroundColor">@color/card_background_light</item>
-        <item name="cardElevation">1dp</item>
+        <item name="cardBackgroundColor">@color/surface_container</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/surface_container_highest</item>
         <item name="contentPadding">@dimen/search_suggestion_padding</item>
         <item name="cardCornerRadius">@dimen/search_bar_radius</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:layout_marginRight">@dimen/search_suggestion_margin</item>
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="rippleColor">@color/ripple_material_light</item>
     </style>
 
+    <!-- Search Result Card - Premium Glass Style -->
     <style name="Theme.Launchpad.Search.Result">
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:layout_margin">@dimen/large_spacing</item>
         <item name="android:layout_marginBottom">@dimen/default_spacing</item>
-        <item name="cardCornerRadius">@dimen/search_bar_radius</item>
-        <item name="cardBackgroundColor">@color/card_background_light</item>
-        <item name="cardElevation">1dp</item>
+        <item name="cardCornerRadius">@dimen/result_item_radius</item>
+        <item name="cardBackgroundColor">@color/surface_container_low</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="rippleColor">@color/ripple_material_light</item>
     </style>
 
+    <!-- Pinned Apps Card -->
     <style name="Theme.Launchpad.Pinned">
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:layout_marginRight">@dimen/extra_spacing</item>
         <item name="cardCornerRadius">@dimen/search_bar_radius</item>
-        <item name="cardBackgroundColor">@color/card_background_light</item>
-
+        <item name="cardBackgroundColor">@color/surface_container</item>
+        <item name="rippleColor">@color/ripple_material_light</item>
     </style>
 
+    <!-- Plugin Card -->
     <style name="Theme.Launchpad.PluginCard">
         <item name="android:layout_marginHorizontal">@dimen/extra_spacing</item>
-        <item name="cardCornerRadius">16dp</item>
+        <item name="cardCornerRadius">20dp</item>
         <item name="android:padding">12dp</item>
+        <item name="cardBackgroundColor">@color/surface_container</item>
+        <item name="cardElevation">0dp</item>
     </style>
 
+    <!-- Button Card Style -->
     <style name="Theme.Launchpad.ButtonCard">
         <item name="android:layout_height">@dimen/home_action_card_height</item>
         <item name="android:padding">@dimen/ginormous_spacing</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="rippleColor">@color/ripple_material_light</item>
     </style>
 
     <style name="Theme.Launchpad.ButtonCard.Enabled">

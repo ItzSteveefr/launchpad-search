@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Build
 import android.service.voice.VoiceInteractionSessionService
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
@@ -16,11 +17,15 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.cardview.widget.CardView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.animation.PathInterpolatorCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devrinth.launchpad.R
 import com.devrinth.launchpad.receivers.AssistantActionReceiver
+import com.devrinth.launchpad.utils.AnimUtils
+import com.devrinth.launchpad.utils.GlassBlurHelper
+import com.google.android.material.card.MaterialCardView
 
 class SearchWindow(val context: Context) {
 
@@ -28,6 +33,7 @@ class SearchWindow(val context: Context) {
     private lateinit var resultsView : RecyclerView
 
     private lateinit var launchpadMainLayout: LinearLayout
+    private var rootLayout: CoordinatorLayout? = null
 
     private lateinit var mSearchManager: SearchManager
 
@@ -35,9 +41,9 @@ class SearchWindow(val context: Context) {
         mSearchManager.reloadPlugins()
     }
 
-
-    private var anim = AnimationUtils.loadAnimation(context, R.anim.pop_up)
-    private var animOut = AnimationUtils.loadAnimation(context, R.anim.pop_down)
+    // Use new spring animations
+    private var animIn = AnimationUtils.loadAnimation(context, R.anim.spring_up)
+    private var animOut = AnimationUtils.loadAnimation(context, R.anim.spring_down)
 
     private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -50,9 +56,10 @@ class SearchWindow(val context: Context) {
     private var windowCloseAction: (() -> Unit)? = null
 
     init {
-        val interpolator = PathInterpolatorCompat.create(0.425f, 0.130f, 0.130f, 0.975f)
-        anim.interpolator = interpolator
-        animOut.interpolator = interpolator
+        // Use spring interpolator for smoother animations
+        val interpolator = AnimUtils.getSpringInterpolator()
+        animIn.interpolator = interpolator
+        animOut.interpolator = PathInterpolatorCompat.create(0.4f, 0.0f, 1.0f, 1.0f) // Accelerate out
 
         isAlternateLayout = sharedPreferences.getBoolean("setting_layout_window_alternate", false)
     }
@@ -65,8 +72,38 @@ class SearchWindow(val context: Context) {
         searchCardLayout = contentView.findViewById(R.id.search_card_layout)
 
         resultsView = contentView.findViewById(R.id.results_view)
-//            pinnedResultView = contentView.findViewById(R.id.pinned_apps_view)
-//            pinnedResultView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        
+        // Try to get root layout for glass effect
+        rootLayout = contentView.findViewById(R.id.launchpad_root_layout)
+        
+        // Add haptic feedback on scroll
+        setupScrollHaptics()
+    }
+    
+    /**
+     * Setup haptic feedback when scrolling through results.
+     * Provides subtle CLOCK_TICK feedback while scrolling.
+     */
+    private fun setupScrollHaptics() {
+        resultsView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            private var lastScrollY = 0
+            private var scrollAccumulator = 0
+            private val hapticThreshold = 100 // Pixels scrolled before haptic
+            
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                
+                scrollAccumulator += kotlin.math.abs(dy)
+                
+                if (scrollAccumulator >= hapticThreshold) {
+                    recyclerView.performHapticFeedback(
+                        HapticFeedbackConstants.CLOCK_TICK,
+                        HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+                    )
+                    scrollAccumulator = 0
+                }
+            }
+        })
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -84,25 +121,6 @@ class SearchWindow(val context: Context) {
                 this.hideWindow()
             }
         }
-
-//            pinnedAdapter = PinnedActionListAdapter(pinnedArray, context)
-//            pinnedResultView.adapter = pinnedAdapter
-//
-//            pinnedArray.add(
-//                PinnedActionAdapter(
-//                    "android.intent.action.VIEW",
-//                    "https://google.com",
-//                    AppCompatResources.getDrawable(context, R.drawable.web_search_24)
-//                `)
-//            )
-//            pinnedArray.add(
-//                PinnedActionAdapter(
-//                    "android.intent.action.VIEW",
-//                    "https://google.com",
-//                    AppCompatResources.getDrawable(context, R.drawable.baseline_settings_24)
-//                )
-//            )`
-//            pinnedAdapter.notifyDataSetChanged()
     }
 
     // PUBLIC
@@ -132,6 +150,12 @@ class SearchWindow(val context: Context) {
             }
             window.attributes = window.attributes
         }
+        
+        // Apply glass blur effect to root layout
+        rootLayout?.let { root ->
+            GlassBlurHelper.applyGlassEffect(root, context, 25f)
+        }
+        
         mSearchManager = SearchManager(
             context,
             searchInput,
@@ -144,7 +168,7 @@ class SearchWindow(val context: Context) {
     }
 
     fun fullscreen() {
-        val searchCardView = mContentView.findViewById<CardView>(R.id.search_card_view)
+        val searchCardView = mContentView.findViewById<MaterialCardView>(R.id.search_card_view)
 
         val params = searchCardView.layoutParams as LinearLayout.LayoutParams
         params.width = LinearLayout.LayoutParams.MATCH_PARENT
@@ -161,8 +185,7 @@ class SearchWindow(val context: Context) {
 
     fun showKeyboard() {
         if (sharedPreferences.getBoolean("setting_search_show_keyboard", true)) {
-            //searchInput.requestFocus()
-            searchInput.isFocusableInTouchMode = true // kb
+            searchInput.isFocusableInTouchMode = true
             searchInput.postDelayed({
                 searchInput.requestFocus()
 
@@ -175,6 +198,15 @@ class SearchWindow(val context: Context) {
 
     fun unload() {
         mSearchManager.unloadPlugins()
+        
+        // Clean up glass effect
+        rootLayout?.let { GlassBlurHelper.removeGlassEffect(it) }
+        
+        try {
+            context.unregisterReceiver(reloadReceiver)
+        } catch (e: IllegalArgumentException) {
+            // Receiver not registered
+        }
     }
 
     fun reload() {
@@ -187,16 +219,20 @@ class SearchWindow(val context: Context) {
 
     // -- WINDOW FUNCTION
     fun showWindow() {
-        if (!mContentView.isShown)
-            mContentView.startAnimation(anim)
-
+        if (!mContentView.isShown) {
+            // Provide haptic feedback on window open
+            mContentView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            mContentView.startAnimation(animIn)
+        }
     }
+    
     fun hideWindow() {
+        // Provide subtle haptic feedback on dismiss
+        mContentView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
         mContentView.startAnimation(animOut)
         mContentView.postOnAnimationDelayed({
             mSearchManager.unloadPlugins()
             windowCloseAction?.invoke()
-        }, 120)
+        }, 180)
     }
-
 }

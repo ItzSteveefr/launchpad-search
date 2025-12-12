@@ -88,7 +88,7 @@ class ExternalSearch(var mContext: Context) {
                         CoroutineScope(Dispatchers.Main).launch {
                             listener?.onExternalSearchResult(ResultAdapter(
                                 response.value,
-                                "${response.extra}",
+                                response.extra ?: "",
                                 if (response.imageUrl == null) { mContext.packageManager.getApplicationIcon(pkg) } else { IconUtils.base64ToDrawable(mContext,
                                     response.imageUrl.toString()
                                 ) },
