@@ -99,7 +99,7 @@ object AnimUtils {
      * Get a spring interpolator for XML-based animations.
      * Uses OvershootInterpolator for a subtle bounce effect.
      */
-    fun getSpringInterpolator(): TimeInterpolator {
+    fun getSpringInterpolator(): android.view.animation.Interpolator {
         return OvershootInterpolator(1.2f)
     }
 
@@ -159,7 +159,7 @@ object AnimUtils {
 
         override fun animateAdd(holder: RecyclerView.ViewHolder): Boolean {
             val view = holder.itemView
-            val position = holder.bindingAdapterPosition
+            val position = holder.adapterPosition
             
             // Set initial state
             view.alpha = 0f
