@@ -5,7 +5,7 @@
         <item name="android:navigationBarColor">@color/surface_container</item>
         <item name="preferenceTheme">@style/ThemeOverlay.App.Preference</item>
         <!-- Dynamic color support -->
-        <item name="colorPrimary">?attr/colorPrimaryDynamic</item>
+
         <item name="colorSurface">@color/surface_container_low</item>
     </style>
 

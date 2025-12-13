@@ -72,17 +72,17 @@
 
     <string name="general_warning_assistant_service">Launchpad 正在運行中</string>
 
-    <string name="plugin_search_result">搜尋 %s 中的 %s</string>
+    <string name="plugin_search_result">搜尋 %1$s 中的 %2$s</string>
 
-    <string name="plugin_unit_conversion_result">%.3f %s</string>
-    <string name="plugin_unit_conversion_result_full">%f %s</string>
-    <string name="plugin_unit_conversion_result_units">%s 轉換為 %s</string>
+    <string name="plugin_unit_conversion_result">%1$.3f %2$s</string>
+    <string name="plugin_unit_conversion_result_full">%1$f %2$s</string>
+    <string name="plugin_unit_conversion_result_units">%1$s 轉換為 %2$s</string>
 
-    <string name="plugin_definition_result_title">%s 的詞語替代</string>
+    <string name="plugin_definition_result_title">%1$s 的詞語替代</string>
     <string name="plugin_definition_result">
-        同義詞 : %s
+        同義詞 : %1$s
 
-        反義詞 : %s
+        反義詞 : %2$s
     </string>
 
 

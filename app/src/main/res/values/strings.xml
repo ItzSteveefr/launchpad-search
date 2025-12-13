@@ -86,17 +86,17 @@
 
     <string name="general_warning_assistant_service">Launchpad is already running</string>
 
-    <string name="plugin_search_result">Search %s for %s</string>
+    <string name="plugin_search_result">Search %1$s for %2$s</string>
 
-    <string name="plugin_unit_conversion_result">%.3f %s</string>
-    <string name="plugin_unit_conversion_result_full">%f %s</string>
-    <string name="plugin_unit_conversion_result_units">%s to %s</string>
+    <string name="plugin_unit_conversion_result">%1$.3f %2$s</string>
+    <string name="plugin_unit_conversion_result_full">%1$f %2$s</string>
+    <string name="plugin_unit_conversion_result_units">%1$s to %2$s</string>
 
-    <string name="plugin_definition_result_title">Word alternative for %s</string>
+    <string name="plugin_definition_result_title">Word alternative for %1$s</string>
     <string name="plugin_definition_result">
-        Synonyms : %s
+        Synonyms : %1$s
 
-        Antonyms : %s
+        Antonyms : %2$s
     </string>
 
 
