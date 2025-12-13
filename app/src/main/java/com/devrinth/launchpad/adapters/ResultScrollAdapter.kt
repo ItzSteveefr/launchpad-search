@@ -32,7 +32,7 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
             sharedPreferences.getBoolean("setting_close_on_action", true)
     }
 
-    }
+
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
