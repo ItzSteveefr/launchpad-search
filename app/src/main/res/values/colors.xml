@@ -30,4 +30,5 @@
 
     <!-- Ripple Colors -->
     <color name="ripple_material_light">#1F000000</color>
+    <color name="material_dynamic_primary60">#7D5260</color>
 </resources>

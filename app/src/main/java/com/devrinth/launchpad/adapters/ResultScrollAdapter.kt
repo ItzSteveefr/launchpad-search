@@ -32,7 +32,10 @@ class ResultScrollAdapter(private val mResults: List<ResultAdapter>, private var
             sharedPreferences.getBoolean("setting_close_on_action", true)
     }
 
-    init {
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             mContext.registerReceiver(reloadReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_SHOW),
                 VoiceInteractionSessionService.RECEIVER_EXPORTED

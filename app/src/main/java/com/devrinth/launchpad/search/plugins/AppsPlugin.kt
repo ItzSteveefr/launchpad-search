@@ -32,10 +32,11 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
         File(mContext.cacheDir, "app_cache.txt")
     }
     internal val customKeywords = mutableMapOf<String, String>()
+    private var initJob: Job? = null
 
     override fun pluginInit() {
         mPackageManager = mContext.packageManager
-        CoroutineScope(Dispatchers.IO).launch {
+        initJob = CoroutineScope(Dispatchers.IO).launch {
             if (cacheFile.exists()) {
                 val cachedApps = mutableListOf<AppInfo>()
                 cacheFile.forEachLine { line ->
@@ -135,5 +136,11 @@ class AppsPlugin(mContext: Context) : SearchPlugin(mContext) {
                 )
             }
         }
+    }
+
+    override fun pluginUnInit() {
+        initJob?.cancel()
+        searchJob?.cancel()
+        super.pluginUnInit()
     }
 }
