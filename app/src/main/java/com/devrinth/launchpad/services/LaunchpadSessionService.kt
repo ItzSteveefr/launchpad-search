@@ -43,7 +43,7 @@ class LaunchpadSessionService : VoiceInteractionSessionService() {
             lastUiMode = context.resources.configuration.uiMode
 
             if (Build.VERSION.SDK_INT >= 33) {
-                context.registerReceiver(hideReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_HIDE), RECEIVER_EXPORTED)
+                context.registerReceiver(hideReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_HIDE), Context.RECEIVER_EXPORTED)
             } else {
                 context.registerReceiver(hideReceiver, IntentFilter(AssistantActionReceiver.ACTION_OVERLAY_HIDE))
             }

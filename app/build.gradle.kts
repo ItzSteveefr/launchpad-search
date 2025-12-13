@@ -58,6 +58,7 @@ dependencies {
 
     // WorkManager for periodic clipboard cleanup
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
