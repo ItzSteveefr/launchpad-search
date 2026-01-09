@@ -159,7 +159,7 @@ object AnimUtils {
 
         override fun animateAdd(holder: RecyclerView.ViewHolder): Boolean {
             val view = holder.itemView
-            val position = holder.bindingAdapterPosition
+            val position = holder.adapterPosition
             
             // Set initial state
             view.alpha = 0f
